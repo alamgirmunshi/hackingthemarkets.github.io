@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="hacking the markets: financial programming tutorials by parttimelarry">
+    
+    <link rel="shortcut icon" href="https://hackingthemarkets.github.io/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>web3 tutorial [01/10] - calend3: building a web3 calendly</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://hackingthemarkets.github.io">hacking the markets</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="https://youtube.com/parttimelarry" title="youtube">youtube</a>
+            </li><li>
+                <a href="https://twitter/parttimelarry" title="twitter">twitter</a>
+            </li><li>
+                <a href="https://github.com/hackingthemarkets" title="github">github</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>web3 tutorial [01/10] - calend3: building a web3 calendly</h1>
+            <div>
+                <time>February 1, 2021</time>
+                
+                <span>
+                    
+                        by parttimelarry
+                    
+                </span></div>
+    </header><h1 id="calendly-web3-and-twitter">Calendly, Web3, and Twitter</h1>
+<p>One of my favorite hobbies is building app tutorials in response to trending Twitter topics. On my <a href="https://www.youtube.com/parttimelarry">YouTube channel</a>, we&rsquo;ve used Python to scrape Wall Street Bets, built an ARK Invest database, and parsed PDFs containing Nancy Pelosi&rsquo;s options trades. These apps are fun to build for a few reasons:</p>
+<ol>
+<li>They relate to the current moment in time</li>
+<li>They are more interesting and original than typical example projects</li>
+<li>They aren&rsquo;t too serious, which is part of the fun</li>
+</ol>
+<p>If you&rsquo;ve spent any time on Tech Twitter or Crypto Twitter lately, &ldquo;web3&rdquo; is the hot topic. There is currently a battle between proponents of web3 and its critics. Its proponents claim <strong>web3 is revolutionary</strong> and is the <strong>future of the Internet</strong>. Its critics think it is <strong>at best</strong> a buzzword and <strong>at worst</strong> &ndash; it will destroy planet Earth. As with most things these days, the extremes go a bit too far and the truth is probably somewhere in the middle.</p>
+<h2 id="what-were-building">What We&rsquo;re Building</h2>
+<p>The app (or dapp in this case) we are building in this tutorial was inspired by a few tweets that were trending during my last week at work:</p>
+<ul>
+<li><a href="https://twitter.com/lessin/status/1486477359717187589">‘Calendly’ Etiquette Tweet</a></li>
+<li><a href="https://twitter.com/levie/status/1486567312081571843">Web3 solves the byzantine calendly problem</a></li>
+<li><a href="https://twitter.com/anildash/status/1486582562520985601">Automate realtime auctions for your time</a></li>
+<li><a href="https://twitter.com/jackbutcher/status/1486871374887100416">calendly but every slot is an nft sold to the highest bidder</a></li>
+</ul>
+<img src="/web3-tutorial/calend3/calendly-tweet1.png" style="width: 700px" />
+<p>So this guy wrote up a post about how he finds calendly links offensive, and there was a discussion on Twitter about this for a couple of days. Naturally, there were a few jokes about web3 and calendly. A web3 critic joked about writing code to auction your time to the highest bidder.</p>
+<img src="/web3-tutorial/calend3/calendly-tweet2.png" style="width: 700px" />
+<p>Even though this was a joke, I thought it would be fun to make and would be a good learning experience. I have a lot of time on my hands, so I thought I would build a simple web3 calendar that charges Ether to schedule a meeting. I had been meaning to spend more time learning Solidity, and there is even an <a href="https://docs.soliditylang.org/en/latest/solidity-by-example.html?highlight=auction#blind-auction">auction example in the Solidity documentation</a>.</p>
+<p>As usual, I documented the process along the way and I&rsquo;m going to share it with you. And even if you think a web3 calendar is a silly idea, I hope a handful of people will learn something from this tutorial and go on to build something better. I certainly learned a lot while making it.</p>
+<h2 id="how-we-will-build-it">How We Will Build It</h2>
+<p>This is a 10 part tutorial. Each part has a video and a written version. You are reading Part 1 now. The next 9 parts will build the application step by step so that you can follow along. Here is an overview of each part and its focus:</p>
+<ul>
+<li><strong>Hardhat</strong>. When developing a &ldquo;traditional&rdquo; web application, we typically set up a local development environment (eg. the <a href="https://en.wikipedia.org/wiki/LAMP_(software_bundle)">LAMP stack</a>). When we are developing on Ethereum, we will set up a local environment using Hardhat. This will be the focus of <strong>Part 2</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/hardhat.png" alt="Connect Wallet"></p>
+<ul>
+<li><strong>Solidity and Smart Contracts</strong>. When using a relational database, it is common to write some logic in stored procedures using SQL. I think of a smart contract as being similar to a stored procedure. Instead of being written in SQL, it is written in Solidity. Instead of being stored in PostgreSQL or MySQL, it is stored in a distributed, public database &ndash; the Ethereum blockchain. We&rsquo;ll start by creating a smart contract to set the <strong>rate</strong> to charge for a meeting. This will be the focus of <strong>Part 3</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/smart.png" alt="Connect Wallet"></p>
+<ul>
+<li><strong>Metamask</strong>. Clients will connect to our application using an Ethereum wallet. We will use Metamask since it is the most popular and most developer-friendly. This will be the focus of <strong>Part 4</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/metamask.png" alt="Metamask"></p>
+<ul>
+<li><strong>Alchemy</strong>. Most people don&rsquo;t run their own web server and database server at home. It isn&rsquo;t that hard, but most people don&rsquo;t want to worry about monitoring, alerting, and uptime. Likewise, running an Ethereum node ourselves is time consuming and we are busy people. We want to focus on building our dapp. Therefore we will use Alchemy, a popular node provider, to deploy our smart contract. This will be the focus of <strong>Part 5</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/alchemy.png" alt="Connect Wallet"></p>
+<ul>
+<li><strong>React</strong>. Our app needs a frontend. Users don&rsquo;t really care about your smart contracts or node providers. They just want to click a couple of buttons and get what they want. In this case, they want to schedule an appointment. We&rsquo;ll build a frontend using React, the most popular JavaScript library for building user interfaces. We will first build the <strong>Connect Wallet</strong> screen, which is the sign-in experience for our application. This will be the focus of <strong>Part 6</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/connectwallet.png" alt="Connect Wallet"></p>
+<ul>
+<li><strong>Appointments and Payments</strong>. The <strong>owner</strong> of the calendar will receive <strong>payment in ether</strong> for each meeting. We will calculate the cost of each meeting based on its start and end time. We will charge the client when the meeting is scheduled and store the meeting data in an <strong>array</strong> of <strong>structs</strong>. This will be the focus of <strong>Part 7</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/appointments.png" alt="Appointments"></p>
+<ul>
+<li><strong>Material UI</strong>. One of the primary benefits of using React is its ecosystem. Material UI is a popular component library that we can use to add complex UI components without reinventing the wheel. We will customize a Scheduler component to display a weekly calendar to the client. This will be the focus of <strong>Part 8</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/setrate.png" alt="Set Rate"></p>
+<ul>
+<li><strong>Ethers.js</strong>. You may have built webapps that interact with REST APIs. But in our case, we want to interact with a smart contract. We&rsquo;ll learn how to use Ethers.js and an ABI (Application Binary Interface) to call our smart contract from our UI. This will be the focus of <strong>Part 9</strong>.</li>
+</ul>
+<p><img src="/web3-tutorial/calend3/meeting-form.png" alt="Sign"></p>
+<p><img src="/web3-tutorial/calend3/sign.png" alt="Sign"></p>
+<ul>
+<li><strong>Notifications</strong>. When a client schedules an appointment, we want to know about it immediately. To accomplish this, we&rsquo;ll use <strong>Alchemy Notify</strong> and <strong>Twilio</strong>. We&rsquo;ll receive an <strong>SMS text message</strong> when someone interacts with our smart contract. The message will contain some details about the transaction and provide us a clickable Etherscan link:</li>
+</ul>
+<img style="width: 300px" src="/web3-tutorial/calend3/notifications.png">
+<h1 id="make-it-your-own">Make It Your Own</h1>
+<p>At the end of the tutorial, we will have built an appointment scheduler that uses web3 tools and technologies. Who knows, maybe you can iterate on this and it will be the next billion dollar app. I hope so!</p>
+<p><img src="/web3-tutorial/calend3/scheduled.png" alt="Scheduled"></p>
+</article>
+
+        </main><footer id="footer">
+    copyright © 2022 parttimelarry
+</footer>
+</body>
+</html>
