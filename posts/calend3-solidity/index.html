@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="hacking the markets: financial programming tutorials by parttimelarry">
+    
+    <link rel="shortcut icon" href="https://hackingthemarkets.github.io/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>web3 tutorial [03/10] - solidity: minutely rate smart contract</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://hackingthemarkets.github.io">hacking the markets</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="https://youtube.com/parttimelarry" title="youtube">youtube</a>
+            </li><li>
+                <a href="https://twitter/parttimelarry" title="twitter">twitter</a>
+            </li><li>
+                <a href="https://github.com/hackingthemarkets" title="github">github</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>web3 tutorial [03/10] - solidity: minutely rate smart contract</h1>
+            <div>
+                <time>February 19, 2021</time>
+                
+                <span>
+                    
+                        by parttimelarry
+                    
+                </span></div>
+    </header><h1 id="what-is-solidity">What is Solidity?</h1>
+<p><a href="https://soliditylang.org/">Solidity</a> is a programming language for writing smart contracts on <a href="https://ethereum.org">Ethereum</a>. It has syntax similar to JavaScript by design. If you are a web developer, Solidity programs will look vaguely familiar.</p>
+<p>Unlike JavaScript, Solidity is statically typed. This means you must specify variable types so that they are known at compile time. Statically typed languages are a bit more verbose and typically take longer to plan, write, and compile. However, this upfront time investment reduces bugs in production, which is especially important when dealing with money.</p>
+<aside id="toc">
+    <h4>Table of Contents</h4>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-is-solidity">What is Solidity?</a></li>
+    <li><a href="#our-first-contract">Our First Contract</a>
+      <ul>
+        <li><a href="#what-is-a-contract">What is a contract?</a></li>
+        <li><a href="#license">License</a></li>
+        <li><a href="#pragma">Pragma</a></li>
+      </ul>
+    </li>
+    <li><a href="#setting-a-rate">Setting a Rate</a>
+      <ul>
+        <li><a href="#variables-and-functions">Variables and Functions</a></li>
+        <li><a href="#public-and-private">Public and Private</a></li>
+        <li><a href="#return-values">Return Values</a></li>
+        <li><a href="#view-functions">View Functions</a></li>
+      </ul>
+    </li>
+    <li><a href="#contract-ownership">Contract Ownership</a>
+      <ul>
+        <li><a href="#accounts">Accounts</a></li>
+        <li><a href="#addresses">Addresses</a></li>
+        <li><a href="#constructors">Constructors</a></li>
+        <li><a href="#permissions-and-require">Permissions and require()</a></li>
+      </ul>
+    </li>
+    <li><a href="#writing-a-hardhat-test-script">Writing a Hardhat Test Script</a>
+      <ul>
+        <li><a href="#test-setting-the-rate">Test setting the rate</a></li>
+        <li><a href="#test-permissions">Test permissions</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+</aside>
+
+<h1 id="our-first-contract">Our First Contract</h1>
+<p>Let&rsquo;s write our own smart contract. We are building Calend3, a web3 calendar dapp. So let&rsquo;s create a new file called <strong>Calend3.sol</strong> in the <strong>contracts/</strong> directory of our project and add the following code:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="c1">// million dollar dapp idea goes here
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>Now let&rsquo;s compile the code with hardhat. Open a terminal window. Make sure you are in the top level directory of your project. Enter the following command:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npx hardhat compile
+</code></pre></div><p>You should see the following output:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">Compiling <span class="m">1</span> file with 0.8.4
+Solidity compilation finished successfully
+</code></pre></div><p>Congratulations! You&rsquo;ve just written and compiled a smart contract. You smart. This program doesn&rsquo;t do much yet, but the journey of a thousand miles begins with a single step. Let&rsquo;s talk about this program line by line.</p>
+<h2 id="what-is-a-contract">What is a contract?</h2>
+<p>If you&rsquo;ve programmed in Java or Python, you have probably used a <em><strong>class</strong></em>. In Solidity, we use the word <em><strong>contract</strong></em>. A class is just a collection of <strong>state</strong> and <strong>behavior</strong>. In other words, it is a collection of <strong>data</strong> and <strong>functions</strong> that operate on that data. Persistent data is stored in state variables. Functions can retrieve and modify these variables.</p>
+<p>In one of my previous tutorials, I mentioned that I think of a smart contract like a stored procedure in a relational database. In a database like PostgreSQL or MySQL, you can write database logic in stored procedures. The code for a stored procedure is actually stored in the database. Stored procedures can be used to centralize business logic and enforce data integrity.</p>
+<p>Likewise, the code for smart contracts is stored on the blockchain and enforce changes of state to the blockchain.</p>
+<h2 id="license">License</h2>
+<p><strong>SPDX</strong>, or <strong>Software Package Data Exchange</strong>, is an open standard for specifying software licenses. The official website has a <a href="https://spdx.dev/ids/">list of licenses</a> you can use in your projects. I typically use the MIT license since it is familiar to me and any code I write for a tutorial is free to use and modify.</p>
+<h2 id="pragma">Pragma</h2>
+<p>We use the pragma keyword to control the compilation process. This prevents compiling with incompatible Solidity versions. The line <code>pragma solidity ^0.8.0;</code> means that this program will not compile with versions earlier that 0.8. It also specifies that the code will compile in later versions of Solidity as long as there are no breaking changes. New versions of Solidity could behave differently. For example, a function could be deprecated or best practices could change.</p>
+<h1 id="setting-a-rate">Setting a Rate</h1>
+<p>Okay, our contract doesn&rsquo;t do anything yet. Let&rsquo;s change that by adding some variables and functions. We will intentionally (and unintentionally) make some mistakes along the way so that we learn what can go wrong.</p>
+<h2 id="variables-and-functions">Variables and Functions</h2>
+<p>Since we are making an appointment scheduler that allows the owner to charge money, let&rsquo;s allow the owner of the calendar to set their rate. We&rsquo;ll store the rate as an <strong>unsigned integer</strong>.</p>
+<p>An unsigned integer is specified using <strong>uint</strong> and means that this integer will always be positive. We expect people to charge a non-negative rate. We&rsquo;ll also define some functions to get and set this rate. Let&rsquo;s try to compile the code below:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">rate</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="nf">getRate</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nf">setRate</span><span class="p">(</span><span class="n">_rate</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">➜  npx hardhat compile
+Compiling <span class="m">1</span> file with 0.8.4
+SyntaxError: No visibility specified. Did you intend to add <span class="s2">&#34;public&#34;</span>?
+ --&gt; contracts/Calend3.sol:7:5:
+  <span class="p">|</span>
+<span class="m">7</span> <span class="p">|</span>     <span class="k">function</span> getRate<span class="o">()</span> <span class="o">{</span>
+  <span class="p">|</span>     ^ <span class="o">(</span>Relevant <span class="nb">source</span> part starts here and spans across multiple lines<span class="o">)</span>.
+
+
+SyntaxError: No visibility specified. Did you intend to add <span class="s2">&#34;public&#34;</span>?
+  --&gt; contracts/Calend3.sol:11:5:
+   <span class="p">|</span>
+<span class="m">11</span> <span class="p">|</span>     <span class="k">function</span> setRate<span class="o">(</span>_rate<span class="o">)</span> <span class="o">{</span>
+   <span class="p">|</span>     ^ <span class="o">(</span>Relevant <span class="nb">source</span> part starts here and spans across multiple lines<span class="o">)</span>.
+
+
+DeclarationError: Identifier not found or not unique.
+  --&gt; contracts/Calend3.sol:11:28:
+   <span class="p">|</span>
+<span class="m">11</span> <span class="p">|</span>     <span class="k">function</span> setRate<span class="o">(</span>_rate<span class="o">)</span> <span class="o">{</span>
+   <span class="p">|</span>                      ^^^^^^^^^^^
+
+
+Error HH600: Compilation failed
+</code></pre></div><p>Oh my god. Lots of errors. Massive fail. That&rsquo;s okay. We get knocked down, but we get up again. Let&rsquo;s fix these errors one by one and talk about them along the way.</p>
+<h2 id="public-and-private">Public and Private</h2>
+<p>The first error we encountered was <code>SyntaxError: No visibility specified. Did you intend to add &quot;public&quot;?</code></p>
+<p>This error occurred because we must specify whether each variable or function has <strong>public</strong> or <strong>private</strong> access. A <strong>public</strong> variable or function can be accessed <strong>from outside</strong> of the smart contract. A <strong>private</strong> variable or function can only be accessed or called <strong>from within</strong> the same smart contract.</p>
+<p>Since we ultimately want to expose the rate to a web interface and let the calendar owner set it, we should make the <code>getRate()</code> and <code>setRate()</code> functions public.</p>
+<p>The second error we encountered was <code>DeclarationError: Identifier not found or not unique.</code>. This is because we didn&rsquo;t specify the data type in the function signature. To fix this, we just specify that _rate is an unsigned integer by adding <code>uint</code> in front.</p>
+<p>Let&rsquo;s update our code to fix these errors and then try to compile again:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">rate</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="nf">getRate</span><span class="p">()</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nf">setRate</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_rate</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="n">calend3</span> <span class="n">npx</span> <span class="n">hardhat</span> <span class="n">compile</span>
+<span class="n">Compiling</span> <span class="mi">1</span> <span class="n">file</span> <span class="n">with</span> <span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">4</span>
+<span class="n">TypeError</span><span class="o">:</span> <span class="n">Different</span> <span class="nb">number</span> <span class="kr">of</span> <span class="n">arguments</span> <span class="k">in</span> <span class="k">return</span> <span class="n">statement</span> <span class="n">than</span> <span class="k">in</span> <span class="k">returns</span> <span class="n">declaration</span><span class="p">.</span>
+ <span class="o">--&gt;</span> <span class="n">contracts</span><span class="o">/</span><span class="n">Calend3</span><span class="p">.</span><span class="n">sol</span><span class="o">:</span><span class="mi">8</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span>
+  <span class="o">|</span>
+<span class="mi">8</span> <span class="o">|</span>         <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+  <span class="o">|</span>         <span class="o">^^^^^^^^^^^^</span>
+<span class="n">Error</span> <span class="n">HH600</span><span class="o">:</span> <span class="n">Compilation</span> <span class="n">failed</span>
+</code></pre></div><p>Oh snap! Failed again. Programming is hard.</p>
+<h2 id="return-values">Return Values</h2>
+<p>We got past the first set of errors, but now we have a new problem: <code>TypeError: Different number of arguments in return statement than in returns declaration.</code>. In Solidity, not only do we need to specify the data type for our inputs, we also need to specify the data type for the values we return. I told you statically typed languages are more verbose and take longer to write! Let&rsquo;s add <code>returns (uint)</code> to our program and try again:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">rate</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="nf">getRate</span><span class="p">()</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nf">setRate</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_rate</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">➜ npx hardhat compile
+Compiling <span class="m">1</span> file with 0.8.4
+Warning: Function state mutability can be restricted to view
+ --&gt; contracts/Calend3.sol:7:5:
+  <span class="p">|</span>
+<span class="m">7</span> <span class="p">|</span>     <span class="k">function</span> getRate<span class="o">()</span> public returns <span class="o">(</span>uint<span class="o">)</span> <span class="o">{</span>
+  <span class="p">|</span>     ^ <span class="o">(</span>Relevant <span class="nb">source</span> part starts here and spans across multiple lines<span class="o">)</span>.
+
+Solidity compilation finished successfully
+</code></pre></div><p>Not again! At least this one isn&rsquo;t an error. Notice that we received a warning, but the compilation finished successfully. While we can technically ignore warnings in our programs and even in real life, it is probably best to listen and adjust our behavior.</p>
+<h2 id="view-functions">View Functions</h2>
+<p>A function can be specified as a <strong>view</strong> to ensure it doesn&rsquo;t modify any state. Since our <code>getRate()</code> function does not modify any state,  we can specify that is is a view function.</p>
+<p>Why would we want to do this? What is the benefit? Well, let&rsquo;s say we are working on a big team of engineers and a new engineer works on this codebase. For some reason they decide to add some additional logic to the <code>getRate()</code> function that doubles the rate set by the user, and they try to compile the program.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">rate</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="nf">getRate</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nf">setRate</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_rate</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">➜  calend3 npx hardhat compile
+Compiling <span class="m">1</span> file with 0.8.4
+TypeError: Function declared as view, but this expression <span class="o">(</span>potentially<span class="o">)</span> modifies the state and thus requires non-payable <span class="o">(</span>the default<span class="o">)</span> or payable.
+ --&gt; contracts/Calend3.sol:8:9:
+  <span class="p">|</span>
+<span class="m">8</span> <span class="p">|</span>         <span class="nv">rate</span> <span class="o">=</span> rate * 2<span class="p">;</span>
+  <span class="p">|</span>         ^^^^
+
+Error HH600: Compilation failed
+</code></pre></div><p>They will get a compilation error indicating that the state can not be modified in a view function. When writing smart contracts, there is a cost with modifying state: gas. So we want to specify our intent with the <strong>view</strong> keyword here. This code compiles successfully without warnings:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">rate</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="nf">getRate</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
+         <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nf">setRate</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_rate</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h1 id="contract-ownership">Contract Ownership</h1>
+<p>So far we have created a basic smart contract and have written some functions to get and set a rate. Soon we will add functions for managing appointments. But whose appointments? Whose rate are we setting? Can anyone in the world set the rate? Probably not. Only the owner should have permission to configure the calendar.</p>
+<h2 id="accounts">Accounts</h2>
+<p>In order to control access to the calendar, we need to specify who <strong>owns</strong> it. It should probably be owned by a particular Ethereum account. What is an Ethereum account?</p>
+<p>Straight from the <a href="https://ethereum.org/en/developers/docs/accounts/">Ethereum documentation</a>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">An Ethereum account is an entity with an ether <span class="o">(</span>ETH<span class="o">)</span> balance that can send transactions on Ethereum. 
+Accounts can be user-controlled or deployed as smart contracts.
+
+Ethereum has two account types:
+
+Externally-owned – controlled by anyone with the private keys
+Contract – a smart contract deployed to the network, controlled by code.
+
+Both account types have the ability to:
+
+Receive, hold and send ETH and tokens
+Interact with deployed smart contracts
+</code></pre></div><p>So your Ethereum wallet is an interface for interacting with a keypair for a user-controlled account.</p>
+<p>Also a smart contract is a type of account. When it is deployed, it has its own Ethereum address and is able to receive and hold ETH.</p>
+<h2 id="addresses">Addresses</h2>
+<p>Accounts have an address. Since we frequently use these addresses when writing smart contracts, Solidity has a data type called <em><strong>address</strong></em>. Let&rsquo;s define a variable of type <strong>address</strong> named <strong>owner</strong>, and initialize owner with an Ethereum address.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="kt">address</span> <span class="n">owner</span><span class="p">;</span>
+    
+    <span class="kd">constructor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">owner</span> <span class="o">=</span> <span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nf">getRate</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
+         <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="p">}</span>   
+    
+    <span class="kd">function</span> <span class="nf">setRate</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_rate</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="constructors">Constructors</h2>
+<p>You&rsquo;ll notice we added a special function called the <em><strong>constructor</strong></em>. The constructor is called only once &ndash; when the contract is deployed. The constructor isn&rsquo;t called again after that unless it is redeployed.</p>
+<p>You&rsquo;ll also notice we set the owner address equal to msg.sender. What is msg.sender? <code>msg</code> is a globally defined variable and the sender attribute contains the address that called the function. Since we set this value in the constructor, and the constructor is only called on deployment, the msg.sender will be the Ethereum address that deployed the contract. Since whoever deploys the contract owns the Calendar, we will be able to verify that any configuration functions are only being called by the contract owner.</p>
+<h2 id="permissions-and-require">Permissions and require()</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="c1">// SPDX-License-Identifier: MIT
+</span><span class="c1"></span><span class="k">pragma solidity</span> <span class="o">^</span><span class="mi">0</span><span class="p">.</span><span class="mi">8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="nc">Calend3</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="kt">address</span> <span class="k">public</span> <span class="n">owner</span><span class="p">;</span>
+    
+    <span class="kd">constructor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">owner</span> <span class="o">=</span> <span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nf">getRate</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
+         <span class="k">return</span> <span class="n">rate</span><span class="p">;</span>
+    <span class="p">}</span>   
+    
+    <span class="kd">function</span> <span class="nf">setRate</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_rate</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="nb">msg</span><span class="p">.</span><span class="nb">sender</span> <span class="o">==</span> <span class="n">owner</span><span class="p">,</span> <span class="s">&#34;Only the owner can set the rate&#34;</span><span class="p">);</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h1 id="writing-a-hardhat-test-script">Writing a Hardhat Test Script</h1>
+<p>So far we have only used <strong>hardhat compile</strong> and corrected compilation errors and syntax. But we haven&rsquo;t really tested that our program logic is correct. Hardhat provides functionality for writing tests and logging output. Let&rsquo;s take advantage of this.</p>
+<h2 id="test-setting-the-rate">Test setting the rate</h2>
+<p>You should have renamed the <code>sample-script.js</code> file in your <code>test/</code> directory to <strong>test.js</strong>. Let&rsquo;s open this file and make it look like this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="n">const</span> <span class="p">{</span> <span class="n">expect</span> <span class="p">}</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="s">&#34;chai&#34;</span><span class="p">);</span>
+<span class="n">const</span> <span class="p">{</span> <span class="n">ethers</span> <span class="p">}</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="s">&#34;hardhat&#34;</span><span class="p">);</span>
+
+<span class="n">describe</span><span class="p">(</span><span class="s">&#34;Calend3&#34;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="n">it</span><span class="p">(</span><span class="s">&#34;Set rate&#34;</span><span class="p">,</span> <span class="n">async</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="n">const</span> <span class="n">Contract</span> <span class="o">=</span> <span class="n">await</span> <span class="n">ethers</span><span class="p">.</span><span class="n">getContractFactory</span><span class="p">(</span><span class="s">&#34;Calend3&#34;</span><span class="p">);</span>
+    <span class="n">const</span> <span class="kd">contract</span> <span class="o">=</span> <span class="n">await</span> <span class="n">Contract</span><span class="p">.</span><span class="n">deploy</span><span class="p">();</span>
+    <span class="n">await</span> <span class="kd">contract</span><span class="p">.</span><span class="n">deployed</span><span class="p">();</span>
+
+    <span class="n">const</span> <span class="nb">tx</span> <span class="o">=</span> <span class="n">await</span> <span class="kd">contract</span><span class="p">.</span><span class="n">setRate</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+
+    <span class="c1">// wait until the transaction is mined
+</span><span class="c1"></span>    <span class="n">await</span> <span class="nb">tx</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
+
+    <span class="c1">// verify rate is set correctly
+</span><span class="c1"></span>    <span class="n">expect</span><span class="p">(</span><span class="n">await</span> <span class="kd">contract</span><span class="p">.</span><span class="n">getRate</span><span class="p">()).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+
+</code></pre></div><h2 id="test-permissions">Test permissions</h2>
+<p>Let&rsquo;s add one more test to make sure our permissions are correct. We will use the <strong>ethers.getSigners()</strong> function to get a list of Ethereum account addresses from the hardhat development environment. We will then call setRate() with a different Ethereum address using the <strong>connect()</strong> function. We <strong>expect</strong> this to fail with the message &lsquo;Only the owner can set the rate&rsquo;.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-solidity" data-lang="solidity"><span class="n">const</span> <span class="p">{</span> <span class="n">expect</span> <span class="p">}</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="s">&#34;chai&#34;</span><span class="p">);</span>
+<span class="n">const</span> <span class="p">{</span> <span class="n">ethers</span> <span class="p">}</span> <span class="o">=</span> <span class="nb">require</span><span class="p">(</span><span class="s">&#34;hardhat&#34;</span><span class="p">);</span>
+
+<span class="n">describe</span><span class="p">(</span><span class="s">&#34;Calend3&#34;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="n">it</span><span class="p">(</span><span class="s">&#34;Set rate&#34;</span><span class="p">,</span> <span class="n">async</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="n">const</span> <span class="n">Contract</span> <span class="o">=</span> <span class="n">await</span> <span class="n">ethers</span><span class="p">.</span><span class="n">getContractFactory</span><span class="p">(</span><span class="s">&#34;Calend3&#34;</span><span class="p">);</span>
+    <span class="n">const</span> <span class="kd">contract</span> <span class="o">=</span> <span class="n">await</span> <span class="n">Contract</span><span class="p">.</span><span class="n">deploy</span><span class="p">();</span>
+    <span class="n">await</span> <span class="kd">contract</span><span class="p">.</span><span class="n">deployed</span><span class="p">();</span>
+
+    <span class="n">const</span> <span class="nb">tx</span> <span class="o">=</span> <span class="n">await</span> <span class="kd">contract</span><span class="p">.</span><span class="n">setRate</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+
+    <span class="c1">// wait until the transaction is mined
+</span><span class="c1"></span>    <span class="n">await</span> <span class="nb">tx</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
+
+    <span class="c1">// verify rate is set correctly
+</span><span class="c1"></span>    <span class="n">expect</span><span class="p">(</span><span class="n">await</span> <span class="kd">contract</span><span class="p">.</span><span class="n">getRate</span><span class="p">()).</span><span class="n">to</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+
+    <span class="c1">// get addresses
+</span><span class="c1"></span>    <span class="n">const</span> <span class="p">[</span><span class="n">owner</span><span class="p">,</span> <span class="n">addr1</span><span class="p">,</span> <span class="n">addr2</span><span class="p">]</span> <span class="o">=</span> <span class="n">await</span> <span class="n">ethers</span><span class="p">.</span><span class="n">getSigners</span><span class="p">();</span>
+
+    <span class="c1">// call setRate using a different account address
+</span><span class="c1"></span>    <span class="c1">// this should fail since this address is not the owner
+</span><span class="c1"></span>    <span class="n">await</span> <span class="n">expect</span><span class="p">(</span>
+      <span class="kd">contract</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">addr1</span><span class="p">).</span><span class="n">setRate</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+    <span class="p">).</span><span class="n">to</span><span class="p">.</span><span class="n">be</span><span class="p">.</span><span class="n">revertedWith</span><span class="p">(</span><span class="s">&#39;Only the owner can set the rate&#39;</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div></article>
+
+        </main><footer id="footer">
+    copyright © 2022 parttimelarry
+</footer>
+</body>
+</html>

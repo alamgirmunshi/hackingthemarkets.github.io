@@ -6,9 +6,340 @@
     <description>Recent content in Posts on hacking the markets</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 19 Feb 2021 10:31:29 -0800</lastBuildDate>
+    <lastBuildDate>Fri, 19 Feb 2021 11:31:29 -0800</lastBuildDate>
     
 	<atom:link href="https://hackingthemarkets.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>web3 tutorial [03/10] - solidity: minutely rate smart contract</title>
+      <link>https://hackingthemarkets.github.io/posts/calend3-solidity/</link>
+      <pubDate>Fri, 19 Feb 2021 11:31:29 -0800</pubDate>
+      
+      <guid>https://hackingthemarkets.github.io/posts/calend3-solidity/</guid>
+      <description>&lt;h1 id=&#34;what-is-solidity&#34;&gt;What is Solidity?&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://soliditylang.org/&#34;&gt;Solidity&lt;/a&gt; is a programming language for writing smart contracts on &lt;a href=&#34;https://ethereum.org&#34;&gt;Ethereum&lt;/a&gt;. It has syntax similar to JavaScript by design. If you are a web developer, Solidity programs will look vaguely familiar.&lt;/p&gt;
+&lt;p&gt;Unlike JavaScript, Solidity is statically typed. This means you must specify variable types so that they are known at compile time. Statically typed languages are a bit more verbose and typically take longer to plan, write, and compile. However, this upfront time investment reduces bugs in production, which is especially important when dealing with money.&lt;/p&gt;
+&lt;aside id=&#34;toc&#34;&gt;
+    &lt;h4&gt;Table of Contents&lt;/h4&gt;
+    &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#what-is-solidity&#34;&gt;What is Solidity?&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#our-first-contract&#34;&gt;Our First Contract&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#what-is-a-contract&#34;&gt;What is a contract?&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#license&#34;&gt;License&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#pragma&#34;&gt;Pragma&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#setting-a-rate&#34;&gt;Setting a Rate&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#variables-and-functions&#34;&gt;Variables and Functions&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#public-and-private&#34;&gt;Public and Private&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#return-values&#34;&gt;Return Values&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#view-functions&#34;&gt;View Functions&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#contract-ownership&#34;&gt;Contract Ownership&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#accounts&#34;&gt;Accounts&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#addresses&#34;&gt;Addresses&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#constructors&#34;&gt;Constructors&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#permissions-and-require&#34;&gt;Permissions and require()&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#writing-a-hardhat-test-script&#34;&gt;Writing a Hardhat Test Script&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#test-setting-the-rate&#34;&gt;Test setting the rate&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#test-permissions&#34;&gt;Test permissions&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/aside&gt;
+
+&lt;h1 id=&#34;our-first-contract&#34;&gt;Our First Contract&lt;/h1&gt;
+&lt;p&gt;Let&amp;rsquo;s write our own smart contract. We are building Calend3, a web3 calendar dapp. So let&amp;rsquo;s create a new file called &lt;strong&gt;Calend3.sol&lt;/strong&gt; in the &lt;strong&gt;contracts/&lt;/strong&gt; directory of our project and add the following code:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;c1&#34;&gt;// million dollar dapp idea goes here
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now let&amp;rsquo;s compile the code with hardhat. Open a terminal window. Make sure you are in the top level directory of your project. Enter the following command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat compile
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You should see the following output:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;Compiling &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; file with 0.8.4
+Solidity compilation finished successfully
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Congratulations! You&amp;rsquo;ve just written and compiled a smart contract. You smart. This program doesn&amp;rsquo;t do much yet, but the journey of a thousand miles begins with a single step. Let&amp;rsquo;s talk about this program line by line.&lt;/p&gt;
+&lt;h2 id=&#34;what-is-a-contract&#34;&gt;What is a contract?&lt;/h2&gt;
+&lt;p&gt;If you&amp;rsquo;ve programmed in Java or Python, you have probably used a &lt;em&gt;&lt;strong&gt;class&lt;/strong&gt;&lt;/em&gt;. In Solidity, we use the word &lt;em&gt;&lt;strong&gt;contract&lt;/strong&gt;&lt;/em&gt;. A class is just a collection of &lt;strong&gt;state&lt;/strong&gt; and &lt;strong&gt;behavior&lt;/strong&gt;. In other words, it is a collection of &lt;strong&gt;data&lt;/strong&gt; and &lt;strong&gt;functions&lt;/strong&gt; that operate on that data. Persistent data is stored in state variables. Functions can retrieve and modify these variables.&lt;/p&gt;
+&lt;p&gt;In one of my previous tutorials, I mentioned that I think of a smart contract like a stored procedure in a relational database. In a database like PostgreSQL or MySQL, you can write database logic in stored procedures. The code for a stored procedure is actually stored in the database. Stored procedures can be used to centralize business logic and enforce data integrity.&lt;/p&gt;
+&lt;p&gt;Likewise, the code for smart contracts is stored on the blockchain and enforce changes of state to the blockchain.&lt;/p&gt;
+&lt;h2 id=&#34;license&#34;&gt;License&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;SPDX&lt;/strong&gt;, or &lt;strong&gt;Software Package Data Exchange&lt;/strong&gt;, is an open standard for specifying software licenses. The official website has a &lt;a href=&#34;https://spdx.dev/ids/&#34;&gt;list of licenses&lt;/a&gt; you can use in your projects. I typically use the MIT license since it is familiar to me and any code I write for a tutorial is free to use and modify.&lt;/p&gt;
+&lt;h2 id=&#34;pragma&#34;&gt;Pragma&lt;/h2&gt;
+&lt;p&gt;We use the pragma keyword to control the compilation process. This prevents compiling with incompatible Solidity versions. The line &lt;code&gt;pragma solidity ^0.8.0;&lt;/code&gt; means that this program will not compile with versions earlier that 0.8. It also specifies that the code will compile in later versions of Solidity as long as there are no breaking changes. New versions of Solidity could behave differently. For example, a function could be deprecated or best practices could change.&lt;/p&gt;
+&lt;h1 id=&#34;setting-a-rate&#34;&gt;Setting a Rate&lt;/h1&gt;
+&lt;p&gt;Okay, our contract doesn&amp;rsquo;t do anything yet. Let&amp;rsquo;s change that by adding some variables and functions. We will intentionally (and unintentionally) make some mistakes along the way so that we learn what can go wrong.&lt;/p&gt;
+&lt;h2 id=&#34;variables-and-functions&#34;&gt;Variables and Functions&lt;/h2&gt;
+&lt;p&gt;Since we are making an appointment scheduler that allows the owner to charge money, let&amp;rsquo;s allow the owner of the calendar to set their rate. We&amp;rsquo;ll store the rate as an &lt;strong&gt;unsigned integer&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;An unsigned integer is specified using &lt;strong&gt;uint&lt;/strong&gt; and means that this integer will always be positive. We expect people to charge a non-negative rate. We&amp;rsquo;ll also define some functions to get and set this rate. Let&amp;rsquo;s try to compile the code below:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;➜  npx hardhat compile
+Compiling &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; file with 0.8.4
+SyntaxError: No visibility specified. Did you intend to add &lt;span class=&#34;s2&#34;&gt;&amp;#34;public&amp;#34;&lt;/span&gt;?
+ --&amp;gt; contracts/Calend3.sol:7:5:
+  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     &lt;span class=&#34;k&#34;&gt;function&lt;/span&gt; getRate&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     ^ &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;Relevant &lt;span class=&#34;nb&#34;&gt;source&lt;/span&gt; part starts here and spans across multiple lines&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.
+
+
+SyntaxError: No visibility specified. Did you intend to add &lt;span class=&#34;s2&#34;&gt;&amp;#34;public&amp;#34;&lt;/span&gt;?
+  --&amp;gt; contracts/Calend3.sol:11:5:
+   &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;11&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     &lt;span class=&#34;k&#34;&gt;function&lt;/span&gt; setRate&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;_rate&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+   &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     ^ &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;Relevant &lt;span class=&#34;nb&#34;&gt;source&lt;/span&gt; part starts here and spans across multiple lines&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.
+
+
+DeclarationError: Identifier not found or not unique.
+  --&amp;gt; contracts/Calend3.sol:11:28:
+   &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;11&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     &lt;span class=&#34;k&#34;&gt;function&lt;/span&gt; setRate&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;_rate&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+   &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;                      ^^^^^^^^^^^
+
+
+Error HH600: Compilation failed
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Oh my god. Lots of errors. Massive fail. That&amp;rsquo;s okay. We get knocked down, but we get up again. Let&amp;rsquo;s fix these errors one by one and talk about them along the way.&lt;/p&gt;
+&lt;h2 id=&#34;public-and-private&#34;&gt;Public and Private&lt;/h2&gt;
+&lt;p&gt;The first error we encountered was &lt;code&gt;SyntaxError: No visibility specified. Did you intend to add &amp;quot;public&amp;quot;?&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;This error occurred because we must specify whether each variable or function has &lt;strong&gt;public&lt;/strong&gt; or &lt;strong&gt;private&lt;/strong&gt; access. A &lt;strong&gt;public&lt;/strong&gt; variable or function can be accessed &lt;strong&gt;from outside&lt;/strong&gt; of the smart contract. A &lt;strong&gt;private&lt;/strong&gt; variable or function can only be accessed or called &lt;strong&gt;from within&lt;/strong&gt; the same smart contract.&lt;/p&gt;
+&lt;p&gt;Since we ultimately want to expose the rate to a web interface and let the calendar owner set it, we should make the &lt;code&gt;getRate()&lt;/code&gt; and &lt;code&gt;setRate()&lt;/code&gt; functions public.&lt;/p&gt;
+&lt;p&gt;The second error we encountered was &lt;code&gt;DeclarationError: Identifier not found or not unique.&lt;/code&gt;. This is because we didn&amp;rsquo;t specify the data type in the function signature. To fix this, we just specify that _rate is an unsigned integer by adding &lt;code&gt;uint&lt;/code&gt; in front.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s update our code to fix these errors and then try to compile again:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;n&#34;&gt;calend3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;npx&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;hardhat&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;compile&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;Compiling&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;file&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;4&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;TypeError&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Different&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;number&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;of&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;arguments&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;statement&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;than&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;returns&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;declaration&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;
+ &lt;span class=&#34;o&#34;&gt;--&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;contracts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Calend3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sol&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;9&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+  &lt;span class=&#34;o&#34;&gt;|&lt;/span&gt;
+&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;|&lt;/span&gt;         &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+  &lt;span class=&#34;o&#34;&gt;|&lt;/span&gt;         &lt;span class=&#34;o&#34;&gt;^^^^^^^^^^^^&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;Error&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;HH600&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Compilation&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;failed&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Oh snap! Failed again. Programming is hard.&lt;/p&gt;
+&lt;h2 id=&#34;return-values&#34;&gt;Return Values&lt;/h2&gt;
+&lt;p&gt;We got past the first set of errors, but now we have a new problem: &lt;code&gt;TypeError: Different number of arguments in return statement than in returns declaration.&lt;/code&gt;. In Solidity, not only do we need to specify the data type for our inputs, we also need to specify the data type for the values we return. I told you statically typed languages are more verbose and take longer to write! Let&amp;rsquo;s add &lt;code&gt;returns (uint)&lt;/code&gt; to our program and try again:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;returns&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;➜ npx hardhat compile
+Compiling &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; file with 0.8.4
+Warning: Function state mutability can be restricted to view
+ --&amp;gt; contracts/Calend3.sol:7:5:
+  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     &lt;span class=&#34;k&#34;&gt;function&lt;/span&gt; getRate&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt; public returns &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;uint&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;     ^ &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;Relevant &lt;span class=&#34;nb&#34;&gt;source&lt;/span&gt; part starts here and spans across multiple lines&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;.
+
+Solidity compilation finished successfully
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Not again! At least this one isn&amp;rsquo;t an error. Notice that we received a warning, but the compilation finished successfully. While we can technically ignore warnings in our programs and even in real life, it is probably best to listen and adjust our behavior.&lt;/p&gt;
+&lt;h2 id=&#34;view-functions&#34;&gt;View Functions&lt;/h2&gt;
+&lt;p&gt;A function can be specified as a &lt;strong&gt;view&lt;/strong&gt; to ensure it doesn&amp;rsquo;t modify any state. Since our &lt;code&gt;getRate()&lt;/code&gt; function does not modify any state,  we can specify that is is a view function.&lt;/p&gt;
+&lt;p&gt;Why would we want to do this? What is the benefit? Well, let&amp;rsquo;s say we are working on a big team of engineers and a new engineer works on this codebase. For some reason they decide to add some additional logic to the &lt;code&gt;getRate()&lt;/code&gt; function that doubles the rate set by the user, and they try to compile the program.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;view&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;returns&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;➜  calend3 npx hardhat compile
+Compiling &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; file with 0.8.4
+TypeError: Function declared as view, but this expression &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;potentially&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; modifies the state and thus requires non-payable &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;the default&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; or payable.
+ --&amp;gt; contracts/Calend3.sol:8:9:
+  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;8&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;         &lt;span class=&#34;nv&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; rate * 2&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;         ^^^^
+
+Error HH600: Compilation failed
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;They will get a compilation error indicating that the state can not be modified in a view function. When writing smart contracts, there is a cost with modifying state: gas. So we want to specify our intent with the &lt;strong&gt;view&lt;/strong&gt; keyword here. This code compiles successfully without warnings:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;view&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;returns&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+         &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;contract-ownership&#34;&gt;Contract Ownership&lt;/h1&gt;
+&lt;p&gt;So far we have created a basic smart contract and have written some functions to get and set a rate. Soon we will add functions for managing appointments. But whose appointments? Whose rate are we setting? Can anyone in the world set the rate? Probably not. Only the owner should have permission to configure the calendar.&lt;/p&gt;
+&lt;h2 id=&#34;accounts&#34;&gt;Accounts&lt;/h2&gt;
+&lt;p&gt;In order to control access to the calendar, we need to specify who &lt;strong&gt;owns&lt;/strong&gt; it. It should probably be owned by a particular Ethereum account. What is an Ethereum account?&lt;/p&gt;
+&lt;p&gt;Straight from the &lt;a href=&#34;https://ethereum.org/en/developers/docs/accounts/&#34;&gt;Ethereum documentation&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;An Ethereum account is an entity with an ether &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;ETH&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; balance that can send transactions on Ethereum. 
+Accounts can be user-controlled or deployed as smart contracts.
+
+Ethereum has two account types:
+
+Externally-owned – controlled by anyone with the private keys
+Contract – a smart contract deployed to the network, controlled by code.
+
+Both account types have the ability to:
+
+Receive, hold and send ETH and tokens
+Interact with deployed smart contracts
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;So your Ethereum wallet is an interface for interacting with a keypair for a user-controlled account.&lt;/p&gt;
+&lt;p&gt;Also a smart contract is a type of account. When it is deployed, it has its own Ethereum address and is able to receive and hold ETH.&lt;/p&gt;
+&lt;h2 id=&#34;addresses&#34;&gt;Addresses&lt;/h2&gt;
+&lt;p&gt;Accounts have an address. Since we frequently use these addresses when writing smart contracts, Solidity has a data type called &lt;em&gt;&lt;strong&gt;address&lt;/strong&gt;&lt;/em&gt;. Let&amp;rsquo;s define a variable of type &lt;strong&gt;address&lt;/strong&gt; named &lt;strong&gt;owner&lt;/strong&gt;, and initialize owner with an Ethereum address.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;address&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;owner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&#34;kd&#34;&gt;constructor&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;owner&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;msg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;sender&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;view&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;returns&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+         &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;   
+    
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;constructors&#34;&gt;Constructors&lt;/h2&gt;
+&lt;p&gt;You&amp;rsquo;ll notice we added a special function called the &lt;em&gt;&lt;strong&gt;constructor&lt;/strong&gt;&lt;/em&gt;. The constructor is called only once &amp;ndash; when the contract is deployed. The constructor isn&amp;rsquo;t called again after that unless it is redeployed.&lt;/p&gt;
+&lt;p&gt;You&amp;rsquo;ll also notice we set the owner address equal to msg.sender. What is msg.sender? &lt;code&gt;msg&lt;/code&gt; is a globally defined variable and the sender attribute contains the address that called the function. Since we set this value in the constructor, and the constructor is only called on deployment, the msg.sender will be the Ethereum address that deployed the contract. Since whoever deploys the contract owns the Calendar, we will be able to verify that any configuration functions are only being called by the contract owner.&lt;/p&gt;
+&lt;h2 id=&#34;permissions-and-require&#34;&gt;Permissions and require()&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// SPDX-License-Identifier: MIT
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;pragma solidity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;^&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Calend3&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;address&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;owner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&#34;kd&#34;&gt;constructor&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;owner&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;msg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;sender&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;view&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;returns&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+         &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;   
+    
+    &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;uint&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+        &lt;span class=&#34;nb&#34;&gt;require&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;msg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;sender&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;owner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;Only the owner can set the rate&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+        &lt;span class=&#34;n&#34;&gt;rate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_rate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;writing-a-hardhat-test-script&#34;&gt;Writing a Hardhat Test Script&lt;/h1&gt;
+&lt;p&gt;So far we have only used &lt;strong&gt;hardhat compile&lt;/strong&gt; and corrected compilation errors and syntax. But we haven&amp;rsquo;t really tested that our program logic is correct. Hardhat provides functionality for writing tests and logging output. Let&amp;rsquo;s take advantage of this.&lt;/p&gt;
+&lt;h2 id=&#34;test-setting-the-rate&#34;&gt;Test setting the rate&lt;/h2&gt;
+&lt;p&gt;You should have renamed the &lt;code&gt;sample-script.js&lt;/code&gt; file in your &lt;code&gt;test/&lt;/code&gt; directory to &lt;strong&gt;test.js&lt;/strong&gt;. Let&amp;rsquo;s open this file and make it look like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;expect&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;require&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;chai&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ethers&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;require&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;hardhat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+&lt;span class=&#34;n&#34;&gt;describe&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;n&#34;&gt;it&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Set rate&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ethers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;getContractFactory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;deploy&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;deployed&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+    &lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;tx&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+    &lt;span class=&#34;c1&#34;&gt;// wait until the transaction is mined
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;tx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;wait&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+    &lt;span class=&#34;c1&#34;&gt;// verify rate is set correctly
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;expect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;to&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;equal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;test-permissions&#34;&gt;Test permissions&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s add one more test to make sure our permissions are correct. We will use the &lt;strong&gt;ethers.getSigners()&lt;/strong&gt; function to get a list of Ethereum account addresses from the hardhat development environment. We will then call setRate() with a different Ethereum address using the &lt;strong&gt;connect()&lt;/strong&gt; function. We &lt;strong&gt;expect&lt;/strong&gt; this to fail with the message &amp;lsquo;Only the owner can set the rate&amp;rsquo;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-solidity&#34; data-lang=&#34;solidity&#34;&gt;&lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;expect&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;require&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;chai&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ethers&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;require&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;hardhat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+&lt;span class=&#34;n&#34;&gt;describe&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;n&#34;&gt;it&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Set rate&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ethers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;getContractFactory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;deploy&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;deployed&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+    &lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;tx&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+    &lt;span class=&#34;c1&#34;&gt;// wait until the transaction is mined
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;tx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;wait&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+    &lt;span class=&#34;c1&#34;&gt;// verify rate is set correctly
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;expect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;getRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;to&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;equal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+    &lt;span class=&#34;c1&#34;&gt;// get addresses
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;owner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;addr1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;addr2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ethers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;getSigners&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+    &lt;span class=&#34;c1&#34;&gt;// call setRate using a different account address
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// this should fail since this address is not the owner
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;expect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+      &lt;span class=&#34;kd&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;connect&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;addr1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;setRate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;500&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;to&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;be&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;revertedWith&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#39;Only the owner can set the rate&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+    </item>
     
     
     
@@ -231,7 +562,7 @@ To get &lt;span class=&#34;nb&#34;&gt;help&lt;/span&gt; &lt;span class=&#34;k&#3
     <item>
       <title>web3 tutorial [01/10] - calend3: building a web3 calendly</title>
       <link>https://hackingthemarkets.github.io/posts/calend3-web3-calendly/</link>
-      <pubDate>Fri, 19 Feb 2021 09:31:29 -0800</pubDate>
+      <pubDate>Fri, 19 Feb 2021 06:31:29 -0800</pubDate>
       
       <guid>https://hackingthemarkets.github.io/posts/calend3-web3-calendly/</guid>
       <description>&lt;br /&gt;
