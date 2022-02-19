@@ -18,7 +18,13 @@
       <pubDate>Fri, 19 Feb 2021 11:31:29 -0800</pubDate>
       
       <guid>https://hackingthemarkets.github.io/posts/calend3-solidity/</guid>
-      <description>&lt;h1 id=&#34;what-is-solidity&#34;&gt;What is Solidity?&lt;/h1&gt;
+      <description>&lt;br /&gt;
+
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
+  &lt;iframe src=&#34;https://www.youtube.com/embed/ovFRRlw6sKI&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&#34;what-is-solidity&#34;&gt;What is Solidity?&lt;/h1&gt;
 &lt;p&gt;&lt;a href=&#34;https://soliditylang.org/&#34;&gt;Solidity&lt;/a&gt; is a programming language for writing smart contracts on &lt;a href=&#34;https://ethereum.org&#34;&gt;Ethereum&lt;/a&gt;. It has syntax similar to JavaScript by design. If you are a web developer, Solidity programs will look vaguely familiar.&lt;/p&gt;
 &lt;p&gt;Unlike JavaScript, Solidity is statically typed. This means you must specify variable types so that they are known at compile time. Statically typed languages are a bit more verbose and typically take longer to plan, write, and compile. However, this upfront time investment reduces bugs in production, which is especially important when dealing with money.&lt;/p&gt;
 &lt;aside id=&#34;toc&#34;&gt;
