@@ -6,9 +6,225 @@
     <description>Recent content in Posts on hacking the markets</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 19 Feb 2021 09:31:29 -0800</lastBuildDate>
+    <lastBuildDate>Fri, 19 Feb 2021 10:31:29 -0800</lastBuildDate>
     
 	<atom:link href="https://hackingthemarkets.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>web3 tutorial [02/10] - hardhat: ethereum development environment</title>
+      <link>https://hackingthemarkets.github.io/posts/calend3-hardhat/</link>
+      <pubDate>Fri, 19 Feb 2021 10:31:29 -0800</pubDate>
+      
+      <guid>https://hackingthemarkets.github.io/posts/calend3-hardhat/</guid>
+      <description>&lt;br /&gt;
+
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
+  &lt;iframe src=&#34;https://www.youtube.com/embed/M8ftcilSNLM&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;aside id=&#34;toc&#34;&gt;
+    &lt;h4&gt;Table of Contents&lt;/h4&gt;
+    &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#web2-vs-web3-development-environment&#34;&gt;Web2 vs. Web3 development environment&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#what-is-hardhat&#34;&gt;What is hardhat?&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#nodejs-and-npm&#34;&gt;Node.js and npm&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#setting-up-your-project&#34;&gt;Setting up your project&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#installing-hardhat&#34;&gt;Installing hardhat&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#hardhat-cli&#34;&gt;Hardhat CLI&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#tasks&#34;&gt;Tasks&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#hardhat-hackathon-boilerplate&#34;&gt;Hardhat Hackathon Boilerplate&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#changing-some-defaults&#34;&gt;Changing Some Defaults&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/aside&gt;
+
+&lt;h1 id=&#34;web2-vs-web3-development-environment&#34;&gt;Web2 vs. Web3 development environment&lt;/h1&gt;
+&lt;p&gt;Cloud services can be expensive. Because of this, we don&amp;rsquo;t want to pay for production infrastructure until our application is tested and ready to go live. So we first set up a local development environment. This environment often consists of a web server (eg. Apache, nginx), a database server (eg. MySQL, PostgreSQL, MongoDB), and a web framework (eg. Ruby on Rails, Flask, Laravel). We write code locally, iterate, and test repeatedly until our application is ready for prime time. Only then do we deploy our app to production.&lt;/p&gt;
+&lt;p&gt;When building a web3 application, our end goal is to deploy our smart contract to Ethereum mainnet where it can be used by the world. But smart contracts are immutable and deploying to mainnet is expensive. We don&amp;rsquo;t want to deploy to mainnet until our code is tested and our data structures are finalized. While our dapp is in development, we want to be able to experiment, make mistakes, evolve our data structures, and simulate transactions using test ether and test accounts.&lt;/p&gt;
+&lt;h1 id=&#34;what-is-hardhat&#34;&gt;What is hardhat?&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://hardhat.org/&#34;&gt;Hardhat&lt;/a&gt; is an Ethereum development environment that allows us to test, compile, and run our smart contract code. It provides a local blockchain where we can deploy our smart contracts and test them with generated accounts and test ether. Once our application is working locally, we can then deploy it to a testnet and ultimately to mainnet.&lt;/p&gt;
+&lt;h1 id=&#34;nodejs-and-npm&#34;&gt;Node.js and npm&lt;/h1&gt;
+&lt;p&gt;Hardhat is distributed as an npm (Node Package Manager) package and uses the Node.js ecosystem. So we must first make sure we have a recent version of node and npm. Let&amp;rsquo;s open a terminal and enter some commands to check:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;node -v
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;v16.10.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npm -v
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;8.3.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;I have node v16.10.0 and npm 8.3.1, but any version of node 16+ should be fine. If you don&amp;rsquo;t already have the node command, download the &lt;a href=&#34;https://nodejs.org/&#34;&gt;nodejs LTS version&lt;/a&gt; for your operating system here. The npm command comes with nodejs.&lt;/p&gt;
+&lt;h1 id=&#34;setting-up-your-project&#34;&gt;Setting up your project&lt;/h1&gt;
+&lt;p&gt;Let&amp;rsquo;s create a new directory for our project:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;mkdir calend3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then inside of the calend3 directory, initialize the project:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; calend3
+npm init -y
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will create a new file called package.json inside of your directory. The &lt;em&gt;&lt;strong&gt;-y&lt;/strong&gt;&lt;/em&gt; flag after &lt;em&gt;&lt;strong&gt;npm init&lt;/strong&gt;&lt;/em&gt; skips the project creation prompts and uses default values for the project name and version. You can always edit these values later.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;nx&#34;&gt;Wrote&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;to&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Users&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;larry&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Projects&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;web3&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;tutorial&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;calend3&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;package&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;json&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+
+&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;version&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;1.0.0&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;main&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;index.js&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;scripts&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;s2&#34;&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;echo \&amp;#34;Error: no test specified\&amp;#34; &amp;amp;&amp;amp; exit 1&amp;#34;&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;keywords&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[],&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;s2&#34;&gt;&amp;#34;license&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;ISC&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;installing-hardhat&#34;&gt;Installing hardhat&lt;/h2&gt;
+&lt;p&gt;Now we have an empty node project. But we haven&amp;rsquo;t installed any packages or dependencies. Let&amp;rsquo;s change that by installing hardhat.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npm install --save-dev hardhat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You will see hardhat install along with its dependencies.&lt;/p&gt;
+&lt;p&gt;Why did we use &lt;em&gt;&lt;strong&gt;&amp;ndash;save-dev&lt;/strong&gt;&lt;/em&gt; here? This flag specifies that hardhat is a development dependency. When our application goes to production, we don&amp;rsquo;t need to bundle hardhat &amp;ndash; it is only used in development.&lt;/p&gt;
+&lt;p&gt;Once the package is installed, your project folder will contain a node_modules directory and a package-lock.json. You will also see that hardhat has been added to your package.json under devDependencies:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;cat package.json
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;version&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;1.0.0&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;web3 appointment scheduler&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;main&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;index.js&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;scripts&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;echo \&amp;#34;Error: no test specified\&amp;#34; &amp;amp;&amp;amp; exit 1&amp;#34;&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;parttimelarry&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;license&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;ISC&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;nt&#34;&gt;&amp;#34;devDependencies&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;hardhat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;^2.8.3&amp;#34;&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;hardhat-cli&#34;&gt;Hardhat CLI&lt;/h1&gt;
+&lt;p&gt;Cool, hardhat is installed. How do we use it? Let&amp;rsquo;s start by typing npx hardhat:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will prompt you to either create a new sample hardhat project or just create an empty hardhat config. Choose the &amp;ldquo;basic sample project&amp;rdquo;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;    &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;                      &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;               &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;    &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;                      &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;               &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;    &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;                      &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;               &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;8888888888&lt;/span&gt;  8888b.  888d888 .d88888 88888b.   8888b.  &lt;span class=&#34;m&#34;&gt;888888&lt;/span&gt;
+&lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;    &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;     &lt;span class=&#34;s2&#34;&gt;&amp;#34;88b 888P&amp;#34;&lt;/span&gt;  d88&lt;span class=&#34;s2&#34;&gt;&amp;#34; 888 888 &amp;#34;&lt;/span&gt;88b     &lt;span class=&#34;s2&#34;&gt;&amp;#34;88b 888
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;888    888 .d888888 888    888  888 888  888 .d888888 888
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;888    888 888  888 888    Y88b 888 888  888 888  888 Y88b.
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;888    888 &amp;#34;&lt;/span&gt;Y888888 &lt;span class=&#34;m&#34;&gt;888&lt;/span&gt;     &lt;span class=&#34;s2&#34;&gt;&amp;#34;Y88888 888  888 &amp;#34;&lt;/span&gt;Y888888  &lt;span class=&#34;s2&#34;&gt;&amp;#34;Y888
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;👷 Welcome to Hardhat v2.8.3 👷‍
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;? What do you want to do? …
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;❯ Create a basic sample project
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;  Create an advanced sample project
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;  Create an advanced sample project that uses TypeScript
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;  Create an empty hardhat.config.js
+&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;  Quit
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;When you choose the basic project, you will be prompted for some information. Just press enter at all of the prompts to use the defaults:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;✔ What &lt;span class=&#34;k&#34;&gt;do&lt;/span&gt; you want to &lt;span class=&#34;k&#34;&gt;do&lt;/span&gt;? · Create a basic sample project
+✔ Hardhat project root: · /Users/larry/Projects/web3-tutorial/calend3
+✔ Do you want to add a .gitignore? &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;Y/n&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; · y
+✔ Do you want to install this sample project&lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt;s dependencies with npm &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;@nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers ethers&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;? &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;Y/n&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; · y
+
+
+npm install --save-dev @nomiclabs/hardhat-waffle@^2.0.0 ethereum-waffle@^3.0.0 chai@^4.2.0 @nomiclabs/hardhat-ethers@^2.0.0 ethers@^5.0.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will install a few more dependencies for development and testing, including chai, waffle, and ethers. We will talk more about how to use these in a moment. You should now see a few more files and folders in your project:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt; tree -L &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;
+.
+├── README.md
+├── contracts
+├── hardhat.config.js
+├── node_modules
+├── package-lock.json
+├── package.json
+├── scripts
+└── &lt;span class=&#34;nb&#34;&gt;test&lt;/span&gt;
+
+&lt;span class=&#34;m&#34;&gt;4&lt;/span&gt; directories, &lt;span class=&#34;m&#34;&gt;4&lt;/span&gt; files
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;tasks&#34;&gt;Tasks&lt;/h2&gt;
+&lt;p&gt;The hardhat CLI command is used to run tasks. A hardhat task is just a JavaScript function that has access to the hardhat runtime environment (HRE). Now that your project is set up, typing &lt;em&gt;&lt;strong&gt;npx hardhat&lt;/strong&gt;&lt;/em&gt; will display a list of available tasks:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;Hardhat version 2.8.3
+
+Usage: hardhat &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;GLOBAL OPTIONS&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &amp;lt;TASK&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;TASK OPTIONS&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+
+GLOBAL OPTIONS:
+
+  --config           	A Hardhat config file.
+  --emoji            	Use emoji in messages.
+  --help             	Shows this message, or a task&lt;span class=&#34;s1&#34;&gt;&amp;#39;s help if its name is provided
+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;  --max-memory       	The maximum amount of memory that Hardhat can use.
+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;  --network          	The network to connect to.
+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;  --show-stack-traces	Show stack traces.
+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;  --tsconfig         	A TypeScript config file.
+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;  --verbose          	Enables Hardhat verbose logging
+&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;  --version          	Shows hardhat&amp;#39;&lt;/span&gt;s version.
+
+
+AVAILABLE TASKS:
+
+  accounts	Prints the list of accounts
+  check   	Check whatever you need
+  clean   	Clears the cache and deletes all artifacts
+  compile 	Compiles the entire project, building all artifacts
+  console 	Opens a hardhat console
+  flatten 	Flattens and prints contracts and their dependencies
+  &lt;span class=&#34;nb&#34;&gt;help&lt;/span&gt;    	Prints this message
+  node    	Starts a JSON-RPC server on top of Hardhat Network
+  run     	Runs a user-defined script after compiling the project
+  &lt;span class=&#34;nb&#34;&gt;test&lt;/span&gt;    	Runs mocha tests
+
+To get &lt;span class=&#34;nb&#34;&gt;help&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; a specific task run: npx hardhat &lt;span class=&#34;nb&#34;&gt;help&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;task&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;One of these tasks is &lt;em&gt;&lt;strong&gt;accounts&lt;/strong&gt;&lt;/em&gt; and it does exactly what the description says: it prints a list of acounts. Let&amp;rsquo;s try this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat accounts
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This outputs a list of account addresses:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+0x90F79bf6EB2c4f870365E785982E1f101E93b906
+0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
+0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc
+0x976EA74026E726554dB657fA54763abd0C3a0aa9
+0x14dC79964da2C08b23698B3D3cc7Ca32193d9955
+0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f
+0xa0Ee7A142d267C1f36714E4a8F75612F20a79720
+0xBcd4042DE499D14e55001CcbB24a551F3b954096
+0x71bE63f3384f5fb98995898A86B02Fb2426c5788
+0xFABB0ac9d68B0B445fB7357272Ff202C5651694a
+0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec
+0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097
+0xcd3B766CCDd6AE721141F452C550Ca635964ce71
+0x2546BcD3c84621e976D8185a91A922aE77ECEc30
+0xbDA5747bFD65F08deb54cb465eB87D40e51B197E
+0xdD2FD4581271e230360230F9337D5c0430Bf44C0
+0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;These are test accounts provided by hardhat. They each have test ether. Rather than creating many wallets ourselves and sending them all Ether to test, we have some test accounts already that are on the local hardhat network. We can use these to test our application.&lt;/p&gt;
+&lt;p&gt;Where is this task defined? Open the hardhat.config.js in your text editor and you can see the code. Notice the task has a name and description, followed by an async JavaScript function. This function retrieves the test accounts from the hardhat environment, then loops through and prints their addresses to the console.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// This is a sample Hardhat task. To learn how to create your own go to
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// https://hardhat.org/guides/create-task.html
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;task&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;accounts&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Prints the list of accounts&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;taskArgs&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;hre&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;accounts&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;hre&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ethers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getSigners&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+  &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;account&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;of&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;accounts&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;console&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;account&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;address&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Hardhat has other built-in tasks like compile, console, test, and node. We will use all of these commands in the next section to compile and test our Solidity code.&lt;/p&gt;
+&lt;h1 id=&#34;hardhat-hackathon-boilerplate&#34;&gt;Hardhat Hackathon Boilerplate&lt;/h1&gt;
+&lt;p&gt;The hardhat team provides a boilerplate hackathon project on Github at &lt;a href=&#34;https://github.com/nomiclabs/hardhat-hackathon-boilerplate&#34;&gt;https://github.com/nomiclabs/hardhat-hackathon-boilerplate&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Take a quick look at the structure of this application to get a feel for how a dapp is structured. It has a contracts directory which contains smart contracts written in Solidity. It also has a frontend directory with a React web application. We will also be implementing a React UI for our application. But instead of using React class components, we will use hooks, which is a bit more modern.&lt;/p&gt;
+&lt;h1 id=&#34;changing-some-defaults&#34;&gt;Changing Some Defaults&lt;/h1&gt;
+&lt;p&gt;Let&amp;rsquo;s make a few modifications to our own hardhat project before moving on to the next section:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Delete the sample contract contracts/Greeter.sol. We will start from scratch.&lt;/li&gt;
+&lt;li&gt;Rename scripts/sample-script.js to deploy.js&lt;/li&gt;
+&lt;li&gt;Rename test/sample-test.js to test.js&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In the next section, we will begin writing some Solidity code.&lt;/p&gt;
+</description>
+    </item>
     
     
     

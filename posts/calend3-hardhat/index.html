@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="hacking the markets: financial programming tutorials by parttimelarry">
+    
+    <link rel="shortcut icon" href="https://hackingthemarkets.github.io/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>web3 tutorial [02/10] - hardhat: ethereum development environment</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://hackingthemarkets.github.io">hacking the markets</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="https://youtube.com/parttimelarry" title="youtube">youtube</a>
+            </li><li>
+                <a href="https://twitter/parttimelarry" title="twitter">twitter</a>
+            </li><li>
+                <a href="https://github.com/hackingthemarkets" title="github">github</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>web3 tutorial [02/10] - hardhat: ethereum development environment</h1>
+            <div>
+                <time>February 19, 2021</time>
+                
+                <span>
+                    
+                        by parttimelarry
+                    
+                </span></div>
+    </header><br />
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/M8ftcilSNLM" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<aside id="toc">
+    <h4>Table of Contents</h4>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#web2-vs-web3-development-environment">Web2 vs. Web3 development environment</a></li>
+    <li><a href="#what-is-hardhat">What is hardhat?</a></li>
+    <li><a href="#nodejs-and-npm">Node.js and npm</a></li>
+    <li><a href="#setting-up-your-project">Setting up your project</a>
+      <ul>
+        <li><a href="#installing-hardhat">Installing hardhat</a></li>
+      </ul>
+    </li>
+    <li><a href="#hardhat-cli">Hardhat CLI</a>
+      <ul>
+        <li><a href="#tasks">Tasks</a></li>
+      </ul>
+    </li>
+    <li><a href="#hardhat-hackathon-boilerplate">Hardhat Hackathon Boilerplate</a></li>
+    <li><a href="#changing-some-defaults">Changing Some Defaults</a></li>
+  </ul>
+</nav>
+</aside>
+
+<h1 id="web2-vs-web3-development-environment">Web2 vs. Web3 development environment</h1>
+<p>Cloud services can be expensive. Because of this, we don&rsquo;t want to pay for production infrastructure until our application is tested and ready to go live. So we first set up a local development environment. This environment often consists of a web server (eg. Apache, nginx), a database server (eg. MySQL, PostgreSQL, MongoDB), and a web framework (eg. Ruby on Rails, Flask, Laravel). We write code locally, iterate, and test repeatedly until our application is ready for prime time. Only then do we deploy our app to production.</p>
+<p>When building a web3 application, our end goal is to deploy our smart contract to Ethereum mainnet where it can be used by the world. But smart contracts are immutable and deploying to mainnet is expensive. We don&rsquo;t want to deploy to mainnet until our code is tested and our data structures are finalized. While our dapp is in development, we want to be able to experiment, make mistakes, evolve our data structures, and simulate transactions using test ether and test accounts.</p>
+<h1 id="what-is-hardhat">What is hardhat?</h1>
+<p><a href="https://hardhat.org/">Hardhat</a> is an Ethereum development environment that allows us to test, compile, and run our smart contract code. It provides a local blockchain where we can deploy our smart contracts and test them with generated accounts and test ether. Once our application is working locally, we can then deploy it to a testnet and ultimately to mainnet.</p>
+<h1 id="nodejs-and-npm">Node.js and npm</h1>
+<p>Hardhat is distributed as an npm (Node Package Manager) package and uses the Node.js ecosystem. So we must first make sure we have a recent version of node and npm. Let&rsquo;s open a terminal and enter some commands to check:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">node -v
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">v16.10.0
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm -v
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">8.3.1
+</code></pre></div><p>I have node v16.10.0 and npm 8.3.1, but any version of node 16+ should be fine. If you don&rsquo;t already have the node command, download the <a href="https://nodejs.org/">nodejs LTS version</a> for your operating system here. The npm command comes with nodejs.</p>
+<h1 id="setting-up-your-project">Setting up your project</h1>
+<p>Let&rsquo;s create a new directory for our project:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">mkdir calend3
+</code></pre></div><p>Then inside of the calend3 directory, initialize the project:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> calend3
+npm init -y
+</code></pre></div><p>This will create a new file called package.json inside of your directory. The <em><strong>-y</strong></em> flag after <em><strong>npm init</strong></em> skips the project creation prompts and uses default values for the project name and version. You can always edit these values later.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Wrote</span> <span class="nx">to</span> <span class="o">/</span><span class="nx">Users</span><span class="o">/</span><span class="nx">larry</span><span class="o">/</span><span class="nx">Projects</span><span class="o">/</span><span class="nx">web3</span><span class="o">-</span><span class="nx">tutorial</span><span class="o">/</span><span class="nx">calend3</span><span class="o">/</span><span class="kr">package</span><span class="p">.</span><span class="nx">json</span><span class="o">:</span>
+
+<span class="p">{</span>
+  <span class="s2">&#34;name&#34;</span><span class="o">:</span> <span class="s2">&#34;calend3&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;version&#34;</span><span class="o">:</span> <span class="s2">&#34;1.0.0&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;description&#34;</span><span class="o">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;main&#34;</span><span class="o">:</span> <span class="s2">&#34;index.js&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;scripts&#34;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&#34;test&#34;</span><span class="o">:</span> <span class="s2">&#34;echo \&#34;Error: no test specified\&#34; &amp;&amp; exit 1&#34;</span>
+  <span class="p">},</span>
+  <span class="s2">&#34;keywords&#34;</span><span class="o">:</span> <span class="p">[],</span>
+  <span class="s2">&#34;author&#34;</span><span class="o">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+  <span class="s2">&#34;license&#34;</span><span class="o">:</span> <span class="s2">&#34;ISC&#34;</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="installing-hardhat">Installing hardhat</h2>
+<p>Now we have an empty node project. But we haven&rsquo;t installed any packages or dependencies. Let&rsquo;s change that by installing hardhat.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm install --save-dev hardhat
+</code></pre></div><p>You will see hardhat install along with its dependencies.</p>
+<p>Why did we use <em><strong>&ndash;save-dev</strong></em> here? This flag specifies that hardhat is a development dependency. When our application goes to production, we don&rsquo;t need to bundle hardhat &ndash; it is only used in development.</p>
+<p>Once the package is installed, your project folder will contain a node_modules directory and a package-lock.json. You will also see that hardhat has been added to your package.json under devDependencies:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">cat package.json
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;calend3&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;1.0.0&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;web3 appointment scheduler&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;main&#34;</span><span class="p">:</span> <span class="s2">&#34;index.js&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;scripts&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;test&#34;</span><span class="p">:</span> <span class="s2">&#34;echo \&#34;Error: no test specified\&#34; &amp;&amp; exit 1&#34;</span>
+  <span class="p">},</span>
+  <span class="nt">&#34;author&#34;</span><span class="p">:</span> <span class="s2">&#34;parttimelarry&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;license&#34;</span><span class="p">:</span> <span class="s2">&#34;ISC&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;devDependencies&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;hardhat&#34;</span><span class="p">:</span> <span class="s2">&#34;^2.8.3&#34;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h1 id="hardhat-cli">Hardhat CLI</h1>
+<p>Cool, hardhat is installed. How do we use it? Let&rsquo;s start by typing npx hardhat:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npx hardhat
+</code></pre></div><p>This will prompt you to either create a new sample hardhat project or just create an empty hardhat config. Choose the &ldquo;basic sample project&rdquo;.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="m">888</span>    <span class="m">888</span>                      <span class="m">888</span> <span class="m">888</span>               <span class="m">888</span>
+<span class="m">888</span>    <span class="m">888</span>                      <span class="m">888</span> <span class="m">888</span>               <span class="m">888</span>
+<span class="m">888</span>    <span class="m">888</span>                      <span class="m">888</span> <span class="m">888</span>               <span class="m">888</span>
+<span class="m">8888888888</span>  8888b.  888d888 .d88888 88888b.   8888b.  <span class="m">888888</span>
+<span class="m">888</span>    <span class="m">888</span>     <span class="s2">&#34;88b 888P&#34;</span>  d88<span class="s2">&#34; 888 888 &#34;</span>88b     <span class="s2">&#34;88b 888
+</span><span class="s2">888    888 .d888888 888    888  888 888  888 .d888888 888
+</span><span class="s2">888    888 888  888 888    Y88b 888 888  888 888  888 Y88b.
+</span><span class="s2">888    888 &#34;</span>Y888888 <span class="m">888</span>     <span class="s2">&#34;Y88888 888  888 &#34;</span>Y888888  <span class="s2">&#34;Y888
+</span><span class="s2">
+</span><span class="s2">👷 Welcome to Hardhat v2.8.3 👷‍
+</span><span class="s2">
+</span><span class="s2">? What do you want to do? …
+</span><span class="s2">❯ Create a basic sample project
+</span><span class="s2">  Create an advanced sample project
+</span><span class="s2">  Create an advanced sample project that uses TypeScript
+</span><span class="s2">  Create an empty hardhat.config.js
+</span><span class="s2">  Quit
+</span></code></pre></div><p>When you choose the basic project, you will be prompted for some information. Just press enter at all of the prompts to use the defaults:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">✔ What <span class="k">do</span> you want to <span class="k">do</span>? · Create a basic sample project
+✔ Hardhat project root: · /Users/larry/Projects/web3-tutorial/calend3
+✔ Do you want to add a .gitignore? <span class="o">(</span>Y/n<span class="o">)</span> · y
+✔ Do you want to install this sample project<span class="err">&#39;</span>s dependencies with npm <span class="o">(</span>@nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers ethers<span class="o">)</span>? <span class="o">(</span>Y/n<span class="o">)</span> · y
+
+
+npm install --save-dev @nomiclabs/hardhat-waffle@^2.0.0 ethereum-waffle@^3.0.0 chai@^4.2.0 @nomiclabs/hardhat-ethers@^2.0.0 ethers@^5.0.0
+</code></pre></div><p>This will install a few more dependencies for development and testing, including chai, waffle, and ethers. We will talk more about how to use these in a moment. You should now see a few more files and folders in your project:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"> tree -L <span class="m">1</span>
+.
+├── README.md
+├── contracts
+├── hardhat.config.js
+├── node_modules
+├── package-lock.json
+├── package.json
+├── scripts
+└── <span class="nb">test</span>
+
+<span class="m">4</span> directories, <span class="m">4</span> files
+</code></pre></div><h2 id="tasks">Tasks</h2>
+<p>The hardhat CLI command is used to run tasks. A hardhat task is just a JavaScript function that has access to the hardhat runtime environment (HRE). Now that your project is set up, typing <em><strong>npx hardhat</strong></em> will display a list of available tasks:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npx hardhat
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">Hardhat version 2.8.3
+
+Usage: hardhat <span class="o">[</span>GLOBAL OPTIONS<span class="o">]</span> &lt;TASK&gt; <span class="o">[</span>TASK OPTIONS<span class="o">]</span>
+
+GLOBAL OPTIONS:
+
+  --config           	A Hardhat config file.
+  --emoji            	Use emoji in messages.
+  --help             	Shows this message, or a task<span class="s1">&#39;s help if its name is provided
+</span><span class="s1">  --max-memory       	The maximum amount of memory that Hardhat can use.
+</span><span class="s1">  --network          	The network to connect to.
+</span><span class="s1">  --show-stack-traces	Show stack traces.
+</span><span class="s1">  --tsconfig         	A TypeScript config file.
+</span><span class="s1">  --verbose          	Enables Hardhat verbose logging
+</span><span class="s1">  --version          	Shows hardhat&#39;</span>s version.
+
+
+AVAILABLE TASKS:
+
+  accounts	Prints the list of accounts
+  check   	Check whatever you need
+  clean   	Clears the cache and deletes all artifacts
+  compile 	Compiles the entire project, building all artifacts
+  console 	Opens a hardhat console
+  flatten 	Flattens and prints contracts and their dependencies
+  <span class="nb">help</span>    	Prints this message
+  node    	Starts a JSON-RPC server on top of Hardhat Network
+  run     	Runs a user-defined script after compiling the project
+  <span class="nb">test</span>    	Runs mocha tests
+
+To get <span class="nb">help</span> <span class="k">for</span> a specific task run: npx hardhat <span class="nb">help</span> <span class="o">[</span>task<span class="o">]</span>
+</code></pre></div><p>One of these tasks is <em><strong>accounts</strong></em> and it does exactly what the description says: it prints a list of acounts. Let&rsquo;s try this out:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npx hardhat accounts
+</code></pre></div><p>This outputs a list of account addresses:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+0x90F79bf6EB2c4f870365E785982E1f101E93b906
+0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
+0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc
+0x976EA74026E726554dB657fA54763abd0C3a0aa9
+0x14dC79964da2C08b23698B3D3cc7Ca32193d9955
+0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f
+0xa0Ee7A142d267C1f36714E4a8F75612F20a79720
+0xBcd4042DE499D14e55001CcbB24a551F3b954096
+0x71bE63f3384f5fb98995898A86B02Fb2426c5788
+0xFABB0ac9d68B0B445fB7357272Ff202C5651694a
+0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec
+0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097
+0xcd3B766CCDd6AE721141F452C550Ca635964ce71
+0x2546BcD3c84621e976D8185a91A922aE77ECEc30
+0xbDA5747bFD65F08deb54cb465eB87D40e51B197E
+0xdD2FD4581271e230360230F9337D5c0430Bf44C0
+0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
+</code></pre></div><p>These are test accounts provided by hardhat. They each have test ether. Rather than creating many wallets ourselves and sending them all Ether to test, we have some test accounts already that are on the local hardhat network. We can use these to test our application.</p>
+<p>Where is this task defined? Open the hardhat.config.js in your text editor and you can see the code. Notice the task has a name and description, followed by an async JavaScript function. This function retrieves the test accounts from the hardhat environment, then loops through and prints their addresses to the console.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// This is a sample Hardhat task. To learn how to create your own go to
+</span><span class="c1">// https://hardhat.org/guides/create-task.html
+</span><span class="c1"></span><span class="nx">task</span><span class="p">(</span><span class="s2">&#34;accounts&#34;</span><span class="p">,</span> <span class="s2">&#34;Prints the list of accounts&#34;</span><span class="p">,</span> <span class="kr">async</span> <span class="p">(</span><span class="nx">taskArgs</span><span class="p">,</span> <span class="nx">hre</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">hre</span><span class="p">.</span><span class="nx">ethers</span><span class="p">.</span><span class="nx">getSigners</span><span class="p">();</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">account</span> <span class="k">of</span> <span class="nx">accounts</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">account</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div><p>Hardhat has other built-in tasks like compile, console, test, and node. We will use all of these commands in the next section to compile and test our Solidity code.</p>
+<h1 id="hardhat-hackathon-boilerplate">Hardhat Hackathon Boilerplate</h1>
+<p>The hardhat team provides a boilerplate hackathon project on Github at <a href="https://github.com/nomiclabs/hardhat-hackathon-boilerplate">https://github.com/nomiclabs/hardhat-hackathon-boilerplate</a>.</p>
+<p>Take a quick look at the structure of this application to get a feel for how a dapp is structured. It has a contracts directory which contains smart contracts written in Solidity. It also has a frontend directory with a React web application. We will also be implementing a React UI for our application. But instead of using React class components, we will use hooks, which is a bit more modern.</p>
+<h1 id="changing-some-defaults">Changing Some Defaults</h1>
+<p>Let&rsquo;s make a few modifications to our own hardhat project before moving on to the next section:</p>
+<ol>
+<li>Delete the sample contract contracts/Greeter.sol. We will start from scratch.</li>
+<li>Rename scripts/sample-script.js to deploy.js</li>
+<li>Rename test/sample-test.js to test.js</li>
+</ol>
+<p>In the next section, we will begin writing some Solidity code.</p>
+</article>
+
+        </main><footer id="footer">
+    copyright © 2022 parttimelarry
+</footer>
+</body>
+</html>
