@@ -6,9 +6,143 @@
     <description>Recent content on hacking the markets</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 20 Feb 2021 08:31:29 -0800</lastBuildDate>
+    <lastBuildDate>Sat, 20 Feb 2021 09:31:29 -0800</lastBuildDate>
     
 	<atom:link href="https://hackingthemarkets.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>web3 tutorial [05/10] - alchemy: deploying our smart contract</title>
+      <link>https://hackingthemarkets.github.io/posts/calend3-alchemy/</link>
+      <pubDate>Sat, 20 Feb 2021 09:31:29 -0800</pubDate>
+      
+      <guid>https://hackingthemarkets.github.io/posts/calend3-alchemy/</guid>
+      <description>&lt;br /&gt;
+
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
+  &lt;iframe src=&#34;https://www.youtube.com/embed/ftGruNA50QU&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;aside id=&#34;toc&#34;&gt;
+    &lt;h4&gt;Table of Contents&lt;/h4&gt;
+    &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#deploying-to-a-testnet&#34;&gt;Deploying to a Testnet&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#what-is-alchemy&#34;&gt;What is Alchemy?&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#create-an-alchemy-app&#34;&gt;Create an Alchemy App&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#copy-your-api-key&#34;&gt;Copy Your API Key&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#hardhat-deployment-configuration&#34;&gt;Hardhat Deployment Configuration&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#create-a-deploy-script&#34;&gt;Create a Deploy Script&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#run-the-deploy-script&#34;&gt;Run the Deploy Script&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/aside&gt;
+
+&lt;h1 id=&#34;deploying-to-a-testnet&#34;&gt;Deploying to a Testnet&lt;/h1&gt;
+&lt;p&gt;So far we have only compiled and tested our smart contract locally. The next step is to deploy it to an Ethereum &lt;strong&gt;testnet&lt;/strong&gt;. There are several testnets available to developers: Rinkeby, Kovan, Ropsten, and Goerli. These networks allow us to test our smart contract in &amp;ldquo;production-like&amp;rdquo; staging environment using &lt;strong&gt;test ether&lt;/strong&gt; before we go to mainnet.&lt;/p&gt;
+&lt;aside id=&#34;toc&#34;&gt;
+    &lt;h4&gt;Table of Contents&lt;/h4&gt;
+    &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#deploying-to-a-testnet&#34;&gt;Deploying to a Testnet&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#what-is-alchemy&#34;&gt;What is Alchemy?&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#create-an-alchemy-app&#34;&gt;Create an Alchemy App&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#copy-your-api-key&#34;&gt;Copy Your API Key&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#hardhat-deployment-configuration&#34;&gt;Hardhat Deployment Configuration&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#create-a-deploy-script&#34;&gt;Create a Deploy Script&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#run-the-deploy-script&#34;&gt;Run the Deploy Script&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/aside&gt;
+
+&lt;h1 id=&#34;what-is-alchemy&#34;&gt;What is Alchemy?&lt;/h1&gt;
+&lt;p&gt;While we &lt;em&gt;could&lt;/em&gt; technically run our own Ethereum node, we would need to invest time and money into reliability, alerting, resource monitoring, and disaster recovery. Ain&amp;rsquo;t nobody got time for that.&lt;/p&gt;
+&lt;p&gt;We want to focus our time and attention on building our dapp. This is why we will be using Alchemy, a blockchain developer platform that provides this node infrastructure for us.&lt;/p&gt;
+&lt;h2 id=&#34;create-an-alchemy-app&#34;&gt;Create an Alchemy App&lt;/h2&gt;
+&lt;p&gt;To get started, visit the &lt;a href=&#34;https://www.alchemy.com/&#34;&gt;Alchemy website&lt;/a&gt; and sign up for an account. Once registered, click the Create App button on your dashboard. You should see a dialog that looks like the one below.&lt;/p&gt;
+&lt;p&gt;Give your application a name and description. Under Network, select Goerli (a test network) and click Create App. This will take you to a dashboard where you can monitor your app.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy1_createapp.png&#34; alt=&#34;Create Alchemy App&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;copy-your-api-key&#34;&gt;Copy Your API Key&lt;/h2&gt;
+&lt;p&gt;On the application dashboard, click the View Key button and copy your key to the clipboard. We will add this key to our hardhat.config.js.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy2_viewkey.png&#34; alt=&#34;Copy API Key&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;hardhat-deployment-configuration&#34;&gt;Hardhat Deployment Configuration&lt;/h1&gt;
+&lt;p&gt;Open your hardhat.config.js file and add the goerli test network using the format below. For the &amp;ldquo;url&amp;rdquo;, paste in the API Key URL you copied above.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;nx&#34;&gt;module&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;exports&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;nx&#34;&gt;solidity&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;0.8.4&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+  &lt;span class=&#34;nx&#34;&gt;networks&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;goerli&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+      &lt;span class=&#34;nx&#34;&gt;url&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;https://eth-goerli.alchemyapi.io/v2/yourapiurl&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+      &lt;span class=&#34;nx&#34;&gt;accounts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;private key here&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Under accounts, you will need to provide a private key. To export your private key from Metamask:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Click the 3 dots on the top right&lt;/li&gt;
+&lt;li&gt;Click Account Details&lt;/li&gt;
+&lt;li&gt;Click the Export Private Key button&lt;/li&gt;
+&lt;li&gt;Enter your Metamask password and Confirm.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy3_export.png&#34; alt=&#34;Export Private Key&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Put your private key in quotes where it says &amp;ldquo;private key here&amp;rdquo;. &lt;strong&gt;DO NOT&lt;/strong&gt; commit this file to git or show it to anyone. We are only using the private key here to deploy our smart contract to the blockchain.&lt;/p&gt;
+&lt;p&gt;Alchemy does not support private keys, this key is used to sign transaction.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://docs.alchemy.com/alchemy/resources/faq&#34;&gt;https://docs.alchemy.com/alchemy/resources/faq&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&#34;create-a-deploy-script&#34;&gt;Create a Deploy Script&lt;/h1&gt;
+&lt;p&gt;When we initialized our hardhat project, it created a default deployment script. Let&amp;rsquo;s edit this to deploy our Calend3 smart contract. Open &lt;strong&gt;scripts/deploy.js&lt;/strong&gt; in your text editor and change greeter to Contract / Calend3 as shown below. Feel free to use a more specific variable name than Contract/contract.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// We require the Hardhat Runtime Environment explicitly here. This is optional
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// but useful for running the script in a standalone fashion through `node &amp;lt;script&amp;gt;`.
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// When running the script with `npx hardhat run &amp;lt;script&amp;gt;` you&amp;#39;ll find the Hardhat
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// Runtime Environment&amp;#39;s members available in the global scope.
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;hre&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;require&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;hardhat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+&lt;span class=&#34;kr&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+  &lt;span class=&#34;c1&#34;&gt;// Hardhat always runs the compile task when running scripts with its command
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// line interface.
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;//
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// If this script is run directly using `node` you may want to call compile
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// manually to make sure everything is compiled
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// await hre.run(&amp;#39;compile&amp;#39;);
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+  &lt;span class=&#34;c1&#34;&gt;// We get the contract to deploy
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;hre&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ethers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getContractFactory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+  &lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;deploy&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+  &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;deployed&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+
+  &lt;span class=&#34;nx&#34;&gt;console&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Calend3 contract deployed to:&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;address&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;c1&#34;&gt;// We recommend this pattern to be able to use async/await everywhere
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// and properly handle errors.
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;then&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;process&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;exit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;catch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;((&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;console&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;nx&#34;&gt;process&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;exit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;run-the-deploy-script&#34;&gt;Run the Deploy Script&lt;/h1&gt;
+&lt;p&gt;To deploy your smart contract to your local blockchain, use hardhat to run the script without a network parameter:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat run scripts/deploy.js
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You should see a message that the contract was deployed to a specific address:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;Calend3 contract deployed to: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will allow us to test our web application locally against our local blockchain.&lt;/p&gt;
+&lt;p&gt;We are going to go ahead and deploy our smart contract to the Goerli testnet. To do this, use the parameter &amp;ndash;network and pass in the name of the test network:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat run scripts/deploy.js --network goerli
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will take a few seconds since it is deploying the smart contract to an actual remote network. Once it is finished, you should see your smart contract&amp;rsquo;s address on the Goerli network:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;Calend3 contract deployed to: 0x2e0f141E3C228D240735A4EBD8Fe07c0E3a6156B
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now that it is deployed, we can see it on the &lt;a href=&#34;https://goerli.etherscan.io/&#34;&gt;Goerli Testnet Etherscan&lt;/a&gt;. Here is a &lt;a href=&#34;https://goerli.etherscan.io/address/0x2e0f141E3C228D240735A4EBD8Fe07c0E3a6156B&#34;&gt;link to mine&lt;/a&gt;. Type your contract address into Goerli Etherscan. You should see a Contract Creation transaction like the one below:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy4_etherscan.png&#34; alt=&#34;Goerli Etherscan&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Amazing! We just deployed a smart contract to an Ethereum testnet. In the next section, we will begin building the user interface for our dapp using React. Let&amp;rsquo;s go!&lt;/p&gt;
+</description>
+    </item>
     
     
     
@@ -717,140 +851,6 @@ To get &lt;span class=&#34;nb&#34;&gt;help&lt;/span&gt; &lt;span class=&#34;k&#3
 &lt;h1 id=&#34;make-it-your-own&#34;&gt;Make It Your Own&lt;/h1&gt;
 &lt;p&gt;At the end of the tutorial, we will have built an appointment scheduler that uses web3 tools and technologies. Who knows, maybe you can iterate on this and it will be the next billion dollar app. I hope so!&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/calend3/scheduled.png&#34; alt=&#34;Scheduled&#34;&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    
-    
-    <item>
-      <title>web3 tutorial [05/10] - alchemy: deploying our smart contract</title>
-      <link>https://hackingthemarkets.github.io/posts/calend3-alchemy/</link>
-      <pubDate>Fri, 05 Feb 2021 08:31:29 -0800</pubDate>
-      
-      <guid>https://hackingthemarkets.github.io/posts/calend3-alchemy/</guid>
-      <description>&lt;br /&gt;
-
-&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
-  &lt;iframe src=&#34;https://www.youtube.com/embed/ftGruNA50QU&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
-&lt;/div&gt;
-
-&lt;aside id=&#34;toc&#34;&gt;
-    &lt;h4&gt;Table of Contents&lt;/h4&gt;
-    &lt;nav id=&#34;TableOfContents&#34;&gt;
-  &lt;ul&gt;
-    &lt;li&gt;&lt;a href=&#34;#deploying-to-a-testnet&#34;&gt;Deploying to a Testnet&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#what-is-alchemy&#34;&gt;What is Alchemy?&lt;/a&gt;
-      &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&#34;#create-an-alchemy-app&#34;&gt;Create an Alchemy App&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&#34;#copy-your-api-key&#34;&gt;Copy Your API Key&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-    &lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#hardhat-deployment-configuration&#34;&gt;Hardhat Deployment Configuration&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#create-a-deploy-script&#34;&gt;Create a Deploy Script&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#run-the-deploy-script&#34;&gt;Run the Deploy Script&lt;/a&gt;&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/nav&gt;
-&lt;/aside&gt;
-
-&lt;h1 id=&#34;deploying-to-a-testnet&#34;&gt;Deploying to a Testnet&lt;/h1&gt;
-&lt;p&gt;So far we have only compiled and tested our smart contract locally. The next step is to deploy it to an Ethereum &lt;strong&gt;testnet&lt;/strong&gt;. There are several testnets available to developers: Rinkeby, Kovan, Ropsten, and Goerli. These networks allow us to test our smart contract in &amp;ldquo;production-like&amp;rdquo; staging environment using &lt;strong&gt;test ether&lt;/strong&gt; before we go to mainnet.&lt;/p&gt;
-&lt;aside id=&#34;toc&#34;&gt;
-    &lt;h4&gt;Table of Contents&lt;/h4&gt;
-    &lt;nav id=&#34;TableOfContents&#34;&gt;
-  &lt;ul&gt;
-    &lt;li&gt;&lt;a href=&#34;#deploying-to-a-testnet&#34;&gt;Deploying to a Testnet&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#what-is-alchemy&#34;&gt;What is Alchemy?&lt;/a&gt;
-      &lt;ul&gt;
-        &lt;li&gt;&lt;a href=&#34;#create-an-alchemy-app&#34;&gt;Create an Alchemy App&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;a href=&#34;#copy-your-api-key&#34;&gt;Copy Your API Key&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-    &lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#hardhat-deployment-configuration&#34;&gt;Hardhat Deployment Configuration&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#create-a-deploy-script&#34;&gt;Create a Deploy Script&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href=&#34;#run-the-deploy-script&#34;&gt;Run the Deploy Script&lt;/a&gt;&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/nav&gt;
-&lt;/aside&gt;
-
-&lt;h1 id=&#34;what-is-alchemy&#34;&gt;What is Alchemy?&lt;/h1&gt;
-&lt;p&gt;While we &lt;em&gt;could&lt;/em&gt; technically run our own Ethereum node, we would need to invest time and money into reliability, alerting, resource monitoring, and disaster recovery. Ain&amp;rsquo;t nobody got time for that.&lt;/p&gt;
-&lt;p&gt;We want to focus our time and attention on building our dapp. This is why we will be using Alchemy, a blockchain developer platform that provides this node infrastructure for us.&lt;/p&gt;
-&lt;h2 id=&#34;create-an-alchemy-app&#34;&gt;Create an Alchemy App&lt;/h2&gt;
-&lt;p&gt;To get started, visit the &lt;a href=&#34;https://www.alchemy.com/&#34;&gt;Alchemy website&lt;/a&gt; and sign up for an account. Once registered, click the Create App button on your dashboard. You should see a dialog that looks like the one below.&lt;/p&gt;
-&lt;p&gt;Give your application a name and description. Under Network, select Goerli (a test network) and click Create App. This will take you to a dashboard where you can monitor your app.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy1_createapp.png&#34; alt=&#34;Create Alchemy App&#34;&gt;&lt;/p&gt;
-&lt;h2 id=&#34;copy-your-api-key&#34;&gt;Copy Your API Key&lt;/h2&gt;
-&lt;p&gt;On the application dashboard, click the View Key button and copy your key to the clipboard. We will add this key to our hardhat.config.js.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy2_viewkey.png&#34; alt=&#34;Copy API Key&#34;&gt;&lt;/p&gt;
-&lt;h1 id=&#34;hardhat-deployment-configuration&#34;&gt;Hardhat Deployment Configuration&lt;/h1&gt;
-&lt;p&gt;Open your hardhat.config.js file and add the goerli test network using the format below. For the &amp;ldquo;url&amp;rdquo;, paste in the API Key URL you copied above.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;nx&#34;&gt;module&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;exports&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-  &lt;span class=&#34;nx&#34;&gt;solidity&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;0.8.4&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-  &lt;span class=&#34;nx&#34;&gt;networks&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;goerli&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-      &lt;span class=&#34;nx&#34;&gt;url&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;https://eth-goerli.alchemyapi.io/v2/yourapiurl&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
-      &lt;span class=&#34;nx&#34;&gt;accounts&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;private key here&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
-    &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Under accounts, you will need to provide a private key. To export your private key from Metamask:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Click the 3 dots on the top right&lt;/li&gt;
-&lt;li&gt;Click Account Details&lt;/li&gt;
-&lt;li&gt;Click the Export Private Key button&lt;/li&gt;
-&lt;li&gt;Enter your Metamask password and Confirm.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy3_export.png&#34; alt=&#34;Export Private Key&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Put your private key in quotes where it says &amp;ldquo;private key here&amp;rdquo;. &lt;strong&gt;DO NOT&lt;/strong&gt; commit this file to git or show it to anyone. We are only using the private key here to deploy our smart contract to the blockchain.&lt;/p&gt;
-&lt;p&gt;Alchemy does not support private keys, this key is used to sign transaction.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://docs.alchemy.com/alchemy/resources/faq&#34;&gt;https://docs.alchemy.com/alchemy/resources/faq&lt;/a&gt;&lt;/p&gt;
-&lt;h1 id=&#34;create-a-deploy-script&#34;&gt;Create a Deploy Script&lt;/h1&gt;
-&lt;p&gt;When we initialized our hardhat project, it created a default deployment script. Let&amp;rsquo;s edit this to deploy our Calend3 smart contract. Open &lt;strong&gt;scripts/deploy.js&lt;/strong&gt; in your text editor and change greeter to Contract / Calend3 as shown below. Feel free to use a more specific variable name than Contract/contract.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// We require the Hardhat Runtime Environment explicitly here. This is optional
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// but useful for running the script in a standalone fashion through `node &amp;lt;script&amp;gt;`.
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// When running the script with `npx hardhat run &amp;lt;script&amp;gt;` you&amp;#39;ll find the Hardhat
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// Runtime Environment&amp;#39;s members available in the global scope.
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;hre&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;require&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;hardhat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-
-&lt;span class=&#34;kr&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-  &lt;span class=&#34;c1&#34;&gt;// Hardhat always runs the compile task when running scripts with its command
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// line interface.
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;//
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// If this script is run directly using `node` you may want to call compile
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// manually to make sure everything is compiled
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// await hre.run(&amp;#39;compile&amp;#39;);
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
-  &lt;span class=&#34;c1&#34;&gt;// We get the contract to deploy
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;hre&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ethers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getContractFactory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Calend3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-  &lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;contract&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;deploy&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
-
-  &lt;span class=&#34;kr&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;deployed&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
-
-  &lt;span class=&#34;nx&#34;&gt;console&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Calend3 contract deployed to:&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;contract&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;address&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
-
-&lt;span class=&#34;c1&#34;&gt;// We recommend this pattern to be able to use async/await everywhere
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// and properly handle errors.
-&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;then&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;process&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;exit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;catch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;((&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;console&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-    &lt;span class=&#34;nx&#34;&gt;process&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;exit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
-  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;run-the-deploy-script&#34;&gt;Run the Deploy Script&lt;/h1&gt;
-&lt;p&gt;To deploy your smart contract to your local blockchain, use hardhat to run the script without a network parameter:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat run scripts/deploy.js
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You should see a message that the contract was deployed to a specific address:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;Calend3 contract deployed to: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will allow us to test our web application locally against our local blockchain.&lt;/p&gt;
-&lt;p&gt;We are going to go ahead and deploy our smart contract to the Goerli testnet. To do this, use the parameter &amp;ndash;network and pass in the name of the test network:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;npx hardhat run scripts/deploy.js --network goerli
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will take a few seconds since it is deploying the smart contract to an actual remote network. Once it is finished, you should see your smart contract&amp;rsquo;s address on the Goerli network:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;Calend3 contract deployed to: 0x2e0f141E3C228D240735A4EBD8Fe07c0E3a6156B
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now that it is deployed, we can see it on the &lt;a href=&#34;https://goerli.etherscan.io/&#34;&gt;Goerli Testnet Etherscan&lt;/a&gt;. Here is a &lt;a href=&#34;https://goerli.etherscan.io/address/0x2e0f141E3C228D240735A4EBD8Fe07c0E3a6156B&#34;&gt;link to mine&lt;/a&gt;. Type your contract address into Goerli Etherscan. You should see a Contract Creation transaction like the one below:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/alchemy/alchemy4_etherscan.png&#34; alt=&#34;Goerli Etherscan&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Amazing! We just deployed a smart contract to an Ethereum testnet. In the next section, we will begin building the user interface for our dapp using React. Let&amp;rsquo;s go!&lt;/p&gt;
 </description>
     </item>
     
