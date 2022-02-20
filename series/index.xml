@@ -12,6 +12,83 @@
     
     
     <item>
+      <title>web3 tutorial [04/10] - metamask: setting up an ethereum wallet</title>
+      <link>https://hackingthemarkets.github.io/posts/calend3-metamask/</link>
+      <pubDate>Sat, 20 Feb 2021 08:31:29 -0800</pubDate>
+      
+      <guid>https://hackingthemarkets.github.io/posts/calend3-metamask/</guid>
+      <description>&lt;br /&gt;
+
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
+  &lt;iframe src=&#34;https://www.youtube.com/embed/odD29qGrdtQ&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;aside id=&#34;toc&#34;&gt;
+    &lt;h4&gt;Table of Contents&lt;/h4&gt;
+    &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=&#34;#what-is-metamask&#34;&gt;What is MetaMask&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#set-up-metamask&#34;&gt;Set Up Metamask&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#download-and-install-the-extension&#34;&gt;Download and Install the Extension&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#create-a-new-wallet&#34;&gt;Create a New Wallet&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#recovery-phrase&#34;&gt;Recovery Phrase&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#connect-to-a-dapp&#34;&gt;Connect to a Dapp&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#ethereum-testnets&#34;&gt;Ethereum Testnets&lt;/a&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#test-ether&#34;&gt;Test Ether&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;a href=&#34;#next-steps&#34;&gt;Next steps&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;/aside&gt;
+
+&lt;h1 id=&#34;what-is-metamask&#34;&gt;What is MetaMask&lt;/h1&gt;
+&lt;p&gt;Metamask is the the most popular Ethereum wallet with tens of millions of active users. It allows users to interact with Decentralized Finance (DeFi) dapps like Uniswap and Aave as well as NFT marketplaces like OpenSea or LooksRare.&lt;/p&gt;
+&lt;p&gt;It is also preferred by dapp developers since it allows you to easily create test accounts and connect to Ethereum testnets. We will be using this functionality extensively to test our web3 dapp during development.&lt;/p&gt;
+&lt;p&gt;MetaMask is a &lt;strong&gt;self custody&lt;/strong&gt; wallet. This means that &lt;strong&gt;you own your keys&lt;/strong&gt; and it is your responsiblity to protect them.&lt;/p&gt;
+&lt;h1 id=&#34;set-up-metamask&#34;&gt;Set Up Metamask&lt;/h1&gt;
+&lt;h2 id=&#34;download-and-install-the-extension&#34;&gt;Download and Install the Extension&lt;/h2&gt;
+&lt;p&gt;Metamask is distributed as a browser extension. To get started, go to the MetaMask homepage and download and install the extension. We will be using the Chrome extension in this tutorial.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask1_download.png&#34; alt=&#34;Download Metamask&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Once we have installed the extension, it is helpful to pin the extension in Chrome so that it is easily accessible.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask2_pin.png&#34; alt=&#34;Pin Metamask Extension&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;create-a-new-wallet&#34;&gt;Create a New Wallet&lt;/h2&gt;
+&lt;p&gt;Once the extension is installed, click Get Started. MetaMask will walk you through the process of importing an existing wallet or creating a new wallet. We will create a new Wallet for this tutorial.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask3_new.png&#34; alt=&#34;Create New&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;recovery-phrase&#34;&gt;Recovery Phrase&lt;/h2&gt;
+&lt;p&gt;MetaMask will prompt you to create a password and will generate a Secret Recovery Phrase. This 12 word phrase allows you to recover your private key. This means that anyone who has your seed phrase can access your wallet and all of your assets. &lt;strong&gt;Write this down and never give it to anyone&lt;/strong&gt;.&lt;/p&gt;
+&lt;img style=&#34;width: 400px&#34; src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask4_password.png&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask5_seedphrase.png&#34; alt=&#34;Write Down Seedphrase&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;connect-to-a-dapp&#34;&gt;Connect to a Dapp&lt;/h1&gt;
+&lt;p&gt;Once your wallet is set up, you can give it a quick test by connecting to a popular dapp like &lt;a href=&#34;https://app.uniswap.org&#34;&gt;Uniswap&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask6_connect.png&#34; alt=&#34;Connect Wallet&#34;&gt;&lt;/p&gt;
+&lt;p&gt;When you click Connect Wallet, MetaMask should prompt you to choose an account. We will write the code for a Connect Wallet button when we build the user interface for our app.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask7_account.png&#34; alt=&#34;Choose Account&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;ethereum-testnets&#34;&gt;Ethereum Testnets&lt;/h1&gt;
+&lt;p&gt;MetaMask allows you to connect your wallet to Ethereum testnets like Rinkeby, Ropsten, Kovan, and Goerli. This is important because we want to test our application on a testnet before deploying to Ethereum mainnet. To enable test networks, go to Settings -&amp;gt; Advanced in MetaMask and flip the switch under Show test networks:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask9b_enabletest.png&#34; alt=&#34;Copy Address&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Then click the dropdown where it says Ethereum Mainnet. Click show test networks and select the Goerli Test Network.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask9a_showtest.png&#34; alt=&#34;Copy Address&#34;&gt;
+&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask9c_goerli.png&#34; alt=&#34;Copy Address&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;test-ether&#34;&gt;Test Ether&lt;/h2&gt;
+&lt;p&gt;We don&amp;rsquo;t want to exchange our hard earned fiat money for Ether just to test our application. We can obtain Testnet Ether from a faucet. Since we are using the the Goerli Testnet, we can use the &lt;a href=&#34;https://faucet.goerli.mudit.blog/&#34;&gt;Goerli Faucet&lt;/a&gt; to request some funds. Using a Twitter account, tweet your Ethereum address and paste the link into the textbox.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask10_tweet.png&#34; alt=&#34;Tweet Ethereum Address&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Then select an amount of Ether to receive:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask11_faucet.png&#34; alt=&#34;Copy Address&#34;&gt;&lt;/p&gt;
+&lt;p&gt;The Ether should arrive in your wallet shortly:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://hackingthemarkets.github.io/web3-tutorial/metamask/metamask12_eth.png&#34; alt=&#34;Copy Address&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;next-steps&#34;&gt;Next steps&lt;/h1&gt;
+&lt;p&gt;Now that we have our wallet set up, we are ready for the next section! In part 5, we will deploy our smart contract to the Goerli Testnet using Alchemy.&lt;/p&gt;
+</description>
+    </item>
+    
+    
+    
+    <item>
       <title>web3 tutorial [03/10] - solidity: minutely rate smart contract</title>
       <link>https://hackingthemarkets.github.io/posts/calend3-solidity/</link>
       <pubDate>Fri, 19 Feb 2021 11:31:29 -0800</pubDate>
