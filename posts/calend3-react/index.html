@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="hacking the markets: financial programming tutorials by parttimelarry">
+    
+    <link rel="shortcut icon" href="https://hackingthemarkets.github.io/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>web3 tutorial [06/10] - react: building the connect wallet screen</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://hackingthemarkets.github.io">hacking the markets</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="https://youtube.com/parttimelarry" title="youtube">youtube</a>
+            </li><li>
+                <a href="https://twitter.com/parttimelarry" title="twitter">twitter</a>
+            </li><li>
+                <a href="https://github.com/hackingthemarkets" title="github">github</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>web3 tutorial [06/10] - react: building the connect wallet screen</h1>
+            <div>
+                <time>February 21, 2021</time>
+                
+                <span>
+                    
+                        by parttimelarry
+                    
+                </span></div>
+    </header>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/Ro3USaw6uZQ" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<aside id="toc">
+    <h4>Table of Contents</h4>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#creating-a-user-interface">Creating a User Interface</a></li>
+    <li><a href="#react-javascript-library-for-user-interfaces">React: JavaScript Library for User Interfaces</a>
+      <ul>
+        <li><a href="#create-react-app">Create React App</a></li>
+      </ul>
+    </li>
+    <li><a href="#connect-wallet-screen">Connect Wallet Screen</a>
+      <ul>
+        <li><a href="#update-appjs">Update App.js</a></li>
+        <li><a href="#update-styles-in-appcss">Update Styles in App.css</a></li>
+        <li><a href="#events">Events</a></li>
+        <li><a href="#provider-and-windowethereum">Provider and window.ethereum</a></li>
+      </ul>
+    </li>
+    <li><a href="#connected-state-and-hooks">Connected State and Hooks</a>
+      <ul>
+        <li><a href="#what-is-a-hook">What is a Hook?</a></li>
+        <li><a href="#the-usestate-hook">The useState() Hook</a></li>
+        <li><a href="#creating-a-placeholder-calendar-component">Creating a Placeholder Calendar Component</a></li>
+        <li><a href="#useeffect-hook">useEffect Hook</a>
+          <ul>
+            <li><a href="#what-is-useeffect">What is useEffect?</a></li>
+            <li><a href="#eth_accounts-vs-eth_requestaccounts">eth_accounts vs. eth_requestAccounts</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#next-steps-appointments">Next Steps: Appointments</a></li>
+  </ul>
+</nav>
+</aside>
+
+<h1 id="creating-a-user-interface">Creating a User Interface</h1>
+<p>So far we have spent all of our time on the backend of our dapp. We discussed Solidity data types and functions, created a smart contract, and deployed it to an Ethereum test network.</p>
+<p>But <strong>how does anyone actually use it</strong>? The vast majority of crypto users, including those who work in the crypto industry, have <em><strong>never written a single line of Solidity code</strong></em>. They don&rsquo;t know how the code looks nor do they care.</p>
+<p>The <a href="https://ethereum.org/en/developers/docs/smart-contracts/">Ethereum documentation</a> uses a <strong>vending machine analogy</strong> when describing smart contracts. A vending machine has logic for accepting some inputs (eg. A3) and returning a certain output (a Kit Kat bar). Does the user of a vending machine need to know about how the vending machine is programmed? No, they just want to press a button, get a snack, and go about their day.</p>
+<p>Likewise, we need to provide a user-friendly interface for our Calendar dapp. We want the UI to be as easy to use as Google Calendar. We will need to build a few components:</p>
+<ol>
+<li><strong>Connect wallet</strong> - the user needs to connect a wallet to use the application</li>
+<li><strong>View calendar</strong> - once a wallet is connected, the user can view the calendar</li>
+<li><strong>Schedule appointment</strong> - the user can click on a timeslot to schedule a meeting</li>
+</ol>
+<p>In this section, we will focus on the first part: connecting a wallet.</p>
+<h1 id="react-javascript-library-for-user-interfaces">React: JavaScript Library for User Interfaces</h1>
+<p><a href="https://reactjs.org/">ReactJS</a> is a popular UI library that is used by apps like Instagram, Airbnb, Netflix, Dropbox, and Discord. It is also a very popular choice for web3 user interfaces due to its large ecosystem, component libraries, and the ability to use it for cross platform mobile applications.</p>
+<h2 id="create-react-app">Create React App</h2>
+<p>Since we already set up nodejs when creating our hardhat project, we are just a command away from having a react application up and running. Per the <a href="https://create-react-app.dev/">Create React App documentation</a>, we simply need to run the create-react-app command with npx. We will do this in the top level of our project, which currently has this directory structure:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">tree -L <span class="m">1</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">.
+├── README.md
+├── artifacts
+├── cache
+├── contracts
+├── hardhat.config.js
+├── node_modules
+├── package-lock.json
+├── package.json
+├── scripts
+└── <span class="nb">test</span>
+</code></pre></div><p>Running the following command will initialize a React application in a new directory named <strong>frontend</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npx create-react-app frontend
+</code></pre></div><p>This will install some packages and set up a directory structure for your frontend:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">Creating a new React app in /Users/larry/Projects/web3-tutorial/calend3/frontend.
+
+Installing packages. This might take a couple of minutes.
+Installing react, react-dom, and react-scripts with cra-template...
+</code></pre></div><p>Once setup has completed, we go into the frontend/ directory and do <code>npm start</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> frontend
+npm start
+</code></pre></div><p>This will start a local nodejs server that runs your frontend on port 3000. To see it, open your browser to http://localhost:3000. You should see the default screen with the React logo:</p>
+<p><img src="/web3-tutorial/react/react1_logo.png" alt="React logo screen"></p>
+<p>Let&rsquo;s take a look at the JavaScript code that renders this screen. Open frontend/src/App.js in your editor:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">import</span> <span class="nx">logo</span> <span class="nx">from</span> <span class="s1">&#39;./logo.svg&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="s1">&#39;./App.css&#39;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">header</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-header&#34;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="p">{</span><span class="nx">logo</span><span class="p">}</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-logo&#34;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&#34;logo&#34;</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+          <span class="nx">Edit</span> <span class="p">&lt;</span><span class="nt">code</span><span class="p">&gt;</span><span class="nx">src</span><span class="o">/</span><span class="nx">App</span><span class="p">.</span><span class="nx">js</span><span class="p">&lt;/</span><span class="nt">code</span><span class="p">&gt;</span> <span class="nx">and</span> <span class="nx">save</span> <span class="nx">to</span> <span class="nx">reload</span><span class="p">.</span>
+        <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">a</span>
+          <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-link&#34;</span>
+          <span class="na">href</span><span class="o">=</span><span class="s">&#34;https://reactjs.org&#34;</span>
+          <span class="na">target</span><span class="o">=</span><span class="s">&#34;_blank&#34;</span>
+          <span class="na">rel</span><span class="o">=</span><span class="s">&#34;noopener noreferrer&#34;</span>
+        <span class="p">&gt;</span>
+          <span class="nx">Learn</span> <span class="nx">React</span>
+        <span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</code></pre></div><p>At the top, we import a couple of external files: the logo image and a stylesheet.</p>
+<p>After that, we see a component called App. A component is just a function that returns some JSX. JSX is a special syntax that React uses. This syntax looks similar to HTML, but React also allows you create and render custom components.</p>
+<h1 id="connect-wallet-screen">Connect Wallet Screen</h1>
+<p>Let&rsquo;s change the default App screen and make it our own. The UI is where you can show your creativity and make your app eyecatching and unique. Let&rsquo;s include the title of our app and a slogan. Below that, let&rsquo;s include an HTML button tag and label is &ldquo;Connect Wallet&rdquo;.</p>
+<h2 id="update-appjs">Update App.js</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">import</span> <span class="s1">&#39;./App.css&#39;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">header</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-header&#34;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="nx">calend3</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;slogan&#34;</span><span class="p">&gt;</span><span class="nx">web3</span> <span class="nx">appointment</span> <span class="nx">scheduler</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">button</span><span class="p">&gt;</span><span class="nx">connect</span> <span class="nx">wallet</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</code></pre></div><h2 id="update-styles-in-appcss">Update Styles in App.css</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-css" data-lang="css"><span class="nt">body</span> <span class="p">{</span>
+  <span class="k">text-align</span><span class="p">:</span> <span class="kc">center</span><span class="p">;</span>
+  <span class="k">background-color</span><span class="p">:</span> <span class="mh">#282c34</span><span class="p">;</span>
+  <span class="k">color</span><span class="p">:</span> <span class="kc">white</span><span class="p">;</span>
+  <span class="k">margin</span><span class="p">:</span> <span class="mi">50</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">h1</span> <span class="p">{</span>
+  <span class="k">margin</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">font-size</span><span class="p">:</span> <span class="mi">5</span><span class="kt">em</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">#</span><span class="nn">slogan</span> <span class="p">{</span>
+  <span class="k">margin</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">font-size</span><span class="p">:</span> <span class="mi">2</span><span class="kt">em</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">button</span> <span class="p">{</span>
+  <span class="k">background</span><span class="p">:</span> <span class="kc">black</span><span class="p">;</span>
+  <span class="k">color</span><span class="p">:</span> <span class="kc">white</span><span class="p">;</span>
+  <span class="k">border</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">font-size</span><span class="p">:</span> <span class="mf">1.5</span><span class="kt">em</span><span class="p">;</span>
+  <span class="k">padding</span><span class="p">:</span> <span class="mi">12</span><span class="kt">px</span><span class="p">;</span>
+  <span class="k">cursor</span><span class="p">:</span> <span class="kc">pointer</span><span class="p">;</span>
+  <span class="k">margin-top</span><span class="p">:</span> <span class="mi">30</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="events">Events</h2>
+<p>We will first present the user with the Connect Wallet screen. We then wait for the user to interact with it and respond appropriately. We do this by listening for <strong>events</strong> that are of interest to us. An event is just something that happens. Here are some examples of events:</p>
+<ol>
+<li>The user moved the mouse</li>
+<li>The user resized the window</li>
+<li>The user clicked a button</li>
+<li>The user typed some text into a field</li>
+</ol>
+<p>In our case, we are specifically interested in when the user clicks the &ldquo;Connect Wallet&rdquo; button. When they click this button, we want to trigger their Metamask wallet. How do we do this? Let&rsquo;s add a function called connect to our App. To call this function we&rsquo;ll add an onClick attribute to our &ldquo;Connect Wallet&rdquo; button:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+
+  <span class="kr">const</span> <span class="nx">connect</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;clicked connect wallet&#39;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">header</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-header&#34;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="nx">calend3</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;slogan&#34;</span><span class="p">&gt;</span><span class="nx">web3</span> <span class="nx">appointment</span> <span class="nx">scheduler</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">button</span> <span class="na">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">connect</span><span class="p">}&gt;</span><span class="nx">connect</span> <span class="nx">wallet</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</code></pre></div><p>Now when you click &ldquo;Connect Wallet&rdquo;, you should see &ldquo;clicked connect wallet&rdquo; in your JavaScript Developer Console.</p>
+<h2 id="provider-and-windowethereum">Provider and window.ethereum</h2>
+<p>So a console message is great and all, but how do we actually interact with MetaMask when the button is clicked? We need to use the Ethereum Provider.</p>
+<p>According to the <a href="https://docs.metamask.io/guide/ethereum-provider.html">Ethereum Provider API documentation</a>:</p>
+<blockquote>
+<p>MetaMask injects a global API into websites visited by its users at window.ethereum. This API allows websites to request users' Ethereum accounts, read data from blockchains the user is connected to, and suggest that the user sign messages and transactions. The presence of the provider object indicates an Ethereum user.</p>
+</blockquote>
+<p>You can access this object at window.ethereum. If you have MetaMask installed and type window.ethereum in the JavaScript console, you should see a JavaScript object. The MetaMask documentation recommends using a package called @metamask/detect-provider to detect the provider.</p>
+<p>Let&rsquo;s go ahead and install this package in the frontend/ directory of our application:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> calend3/frontend
+npm install @metamask/detect-provider
+</code></pre></div><p>Now that it&rsquo;s installed, let&rsquo;s import it and use it in our connect() function.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">import</span> <span class="s1">&#39;./App.css&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">detectEthereumProvider</span> <span class="nx">from</span> <span class="s1">&#39;@metamask/detect-provider&#39;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">connect</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">provider</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">detectEthereumProvider</span><span class="p">();</span>
+      
+      <span class="c1">// returns an array of accounts
+</span><span class="c1"></span>      <span class="kr">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span> <span class="nx">method</span><span class="o">:</span> <span class="s2">&#34;eth_requestAccounts&#34;</span> <span class="p">});</span>
+      
+      <span class="c1">// check if array at least one element
+</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;account found&#39;</span><span class="p">,</span> <span class="nx">accounts</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;No account found&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">header</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-header&#34;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="nx">calend3</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;slogan&#34;</span><span class="p">&gt;</span><span class="nx">web3</span> <span class="nx">appointment</span> <span class="nx">scheduler</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">button</span> <span class="na">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">connect</span><span class="p">}&gt;</span><span class="nx">connect</span> <span class="nx">wallet</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</code></pre></div><p>Pay special attention to the line below.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span> <span class="nx">method</span><span class="o">:</span> <span class="s2">&#34;eth_requestAccounts&#34;</span> <span class="p">});</span>
+</code></pre></div><p>The method <strong>eth_requestAccounts</strong> is part of <a href="https://eips.ethereum.org/EIPS/eip-1102">EIP-1102</a>:</p>
+<blockquote>
+<p>Calling this method may trigger a user interface that allows the user to approve or reject account access for a given dapp.</p>
+</blockquote>
+<p>So we use the <strong>Ethereum Provider</strong> to submit an <strong>RPC Request</strong>. This triggers MetaMask to prompt the user to connect their account and provide an Ethereum address to be identified by.</p>
+<p><img src="/web3-tutorial/react/react2_connect.png" alt="Metamask Connect"></p>
+<p><img src="/web3-tutorial/react/react3_permissions.png" alt="Metamask Allow"></p>
+<p>So now we have successfully connected our wallet, but nothing really happened on our user interface. We still see the &ldquo;Connect Wallet&rdquo; button on the screen. Why? Well, we didn&rsquo;t update the state of our user interface. We want to show a state, wait for events, respond to those events, and update the interface to a new state. Our user interface is &ldquo;react&rdquo;-ing to events and updating the state of the user interface.</p>
+<p>We now want to represent the state of our application when a user has their wallet connected. In this state, what do we want to see? The owner&rsquo;s calendar. Let&rsquo;s render a Calendar component when a user has connected their wallet.</p>
+<h1 id="connected-state-and-hooks">Connected State and Hooks</h1>
+<p>What if the user is already connected? Then we don&rsquo;t need to waste their time with a connect wallet button. Same as if a user is logged in aleady, we don&rsquo;t show them the login button. We show them what they can do when they are logged in. We need to create a state variable.</p>
+<h2 id="what-is-a-hook">What is a Hook?</h2>
+<p>Prior to 2018, React used classes and a function called setState() to update the state of the user interface. But now it is recommended to use <strong>hooks</strong> to update state. Hooks are a bit confusing at first, but will be easier to understand once we use them.</p>
+<h2 id="the-usestate-hook">The useState() Hook</h2>
+<p>The first hook we&rsquo;ll discuss is useState(). The syntax and usage may be a little different than what you are accustomed to, but you get used to it. The useState() hook takes a single input: the initial state. It returns: a variable that holds the state  and a function to update this variable. For example, in our application, we we will add the following useState() line:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="p">[</span><span class="nx">account</span><span class="p">,</span> <span class="nx">setAccount</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="c1">// import useState
+</span><span class="c1"></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">useState</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="s1">&#39;./App.css&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">Calendar</span> <span class="nx">from</span> <span class="s1">&#39;./components/Calendar&#39;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="p">[</span><span class="nx">account</span><span class="p">,</span> <span class="nx">setAccount</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+  <span class="kr">const</span> <span class="nx">connect</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">provider</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">detectEthereumProvider</span><span class="p">();</span>
+</code></pre></div><p>This creates a state variable named <strong>account</strong> that is initialized to <em>false</em>. This also creates a function called <strong>setAccount()</strong> that we can use to set the variable <strong>account</strong>. So if I wrote <strong>setAccount(&ldquo;Larry&rdquo;)</strong>, then account would change values from <em>false</em> to <em>&ldquo;Larry&rdquo;</em>.</p>
+<p>How will we use this? When the UI loads, account will be false. When the user connects their wallet, we will use setAccount() to&hellip;..set account. The account variable will contain the user&rsquo;s account object. So if account is not set, we&rsquo;ll show the Connect Wallet button. When the user clicks Connect Wallet, we will use setAccount to update the state with the user&rsquo;s account details. Once account is set, we will show a Calendar component.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">import</span> <span class="p">{</span> <span class="nx">useState</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="s1">&#39;./App.css&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">detectEthereumProvider</span> <span class="nx">from</span> <span class="s1">&#39;@metamask/detect-provider&#39;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="p">[</span><span class="nx">account</span><span class="p">,</span> <span class="nx">setAccount</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+  <span class="kr">const</span> <span class="nx">connect</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">provider</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">detectEthereumProvider</span><span class="p">();</span>
+      
+      <span class="c1">// returns an array of accounts
+</span><span class="c1"></span>      <span class="kr">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span> <span class="nx">method</span><span class="o">:</span> <span class="s2">&#34;eth_requestAccounts&#34;</span> <span class="p">});</span>
+      
+      <span class="c1">// check if array at least one element. if so, set account to the first one.
+</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">setAccount</span><span class="p">(</span><span class="nx">accounts</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;No account found&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">header</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-header&#34;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="nx">calend3</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;slogan&#34;</span><span class="p">&gt;</span><span class="nx">web3</span> <span class="nx">appointment</span> <span class="nx">scheduler</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+      <span class="p">{</span><span class="o">!</span><span class="nx">account</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">button</span> <span class="na">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">connect</span><span class="p">}&gt;</span><span class="nx">connect</span> <span class="nx">wallet</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;}</span>
+      <span class="p">{</span><span class="nx">account</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span><span class="nx">show</span> <span class="nx">calendar</span> <span class="nx">component</span><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</code></pre></div><h2 id="creating-a-placeholder-calendar-component">Creating a Placeholder Calendar Component</h2>
+<p>We will create a sophisticated Calendar component in the next section. For now, we just want to create a skeleton/shell so that we can test switching to another state.</p>
+<p>Create a directory called <strong>components</strong> in your <strong>frontend/src</strong> directory. In the _<strong>frontend/src/components</strong> directory, create a new file named <strong>Calendar.js</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="nx">Calendar</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;calendar&#34;</span><span class="p">&gt;</span>
+        <span class="nx">Calendar</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Calendar</span><span class="p">;</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-css" data-lang="css"><span class="p">#</span><span class="nn">calendar</span> <span class="p">{</span>
+  <span class="k">background</span><span class="p">:</span> <span class="kc">white</span><span class="p">;</span>
+  <span class="k">color</span><span class="p">:</span> <span class="kc">black</span><span class="p">;</span>
+  <span class="k">font-size</span><span class="p">:</span> <span class="mi">24</span><span class="kt">px</span><span class="p">;</span>
+  <span class="k">padding</span><span class="p">:</span> <span class="mi">20</span><span class="kt">px</span><span class="p">;</span>
+  <span class="k">margin</span><span class="p">:</span> <span class="mi">20</span><span class="kt">px</span><span class="p">;</span>
+  <span class="k">height</span><span class="p">:</span> <span class="mi">600</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>Now we will import our Calendar component into our App.js and render it in the App() component by using <strong><Calendar /></strong> in rendered markup. We will render the <strong><Calendar /></strong> conditionally and only show it if the <strong>account</strong> is set in the state. Likewise we can show the Connect Wallet button conditionally and only show it when the account is <strong>not</strong> set.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">import</span> <span class="p">{</span> <span class="nx">useState</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="s1">&#39;./App.css&#39;</span><span class="p">;</span>
+<span class="c1">// import the Calendar component
+</span><span class="c1"></span><span class="kr">import</span> <span class="nx">Calendar</span> <span class="nx">from</span> <span class="s1">&#39;./components/Calendar&#39;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="p">[</span><span class="nx">account</span><span class="p">,</span> <span class="nx">setAccount</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+  <span class="kr">const</span> <span class="nx">connect</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">provider</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">detectEthereumProvider</span><span class="p">();</span>
+      
+      <span class="c1">// returns an array of accounts
+</span><span class="c1"></span>      <span class="kr">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span> <span class="nx">method</span><span class="o">:</span> <span class="s2">&#34;eth_requestAccounts&#34;</span> <span class="p">});</span>
+      
+      <span class="c1">// check if array at least one element
+</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">setAccount</span><span class="p">(</span><span class="nx">accounts</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;No account found&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">header</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-header&#34;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="nx">calend3</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;slogan&#34;</span><span class="p">&gt;</span><span class="nx">web3</span> <span class="nx">appointment</span> <span class="nx">scheduler</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+      <span class="p">{</span><span class="o">!</span><span class="nx">account</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">button</span> <span class="na">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">connect</span><span class="p">}&gt;</span><span class="nx">connect</span> <span class="nx">wallet</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;}</span>
+      <span class="p">{</span><span class="nx">account</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">Calendar</span> <span class="p">/&gt;}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</code></pre></div><h2 id="useeffect-hook">useEffect Hook</h2>
+<p>There is one more case that we haven&rsquo;t handled yet. What if the user revisits our app after they have previous connected their wallet? We don&rsquo;t want them to have to click Connect Wallet again. It should go straight to the Calendar since they have already identified themselves previously. We want to check if they have already connected their wallet when the page loads.</p>
+<h3 id="what-is-useeffect">What is useEffect?</h3>
+<p><a href="https://reactjs.org/docs/hooks-effect.html">useEffect</a> is a hook where you can write code that needs to run <strong>after</strong> the App renders. In this case, after we load the app, we need to check if the user is connected.</p>
+<h3 id="eth_accounts-vs-eth_requestaccounts">eth_accounts vs. eth_requestAccounts</h3>
+<p>The method <strong>eth_requestAccounts</strong> prompts the user to choose an Ethereum account. In the case of user that has already connected to our dapp before, we don&rsquo;t need to prompt them. We simply want to request the accounts that are already connected. So we will use <strong>eth_accounts</strong>, which simply returns a list of addresses owned by client.</p>
+<p>We will define a new function called isConnected() that checks if the user is already connected. To check this condition on page load, we will call the isConnected() function in the useEffect hook.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">import</span> <span class="p">{</span> <span class="nx">useState</span><span class="p">,</span> <span class="nx">useEffect</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="s1">&#39;./App.css&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">Calendar</span> <span class="nx">from</span> <span class="s1">&#39;./components/Calendar&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">detectEthereumProvider</span> <span class="nx">from</span> <span class="s1">&#39;@metamask/detect-provider&#39;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="p">[</span><span class="nx">account</span><span class="p">,</span> <span class="nx">setAccount</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+  <span class="nx">useEffect</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">isConnected</span><span class="p">();</span>
+  <span class="p">},</span> <span class="p">[]);</span>
+
+  <span class="kr">const</span> <span class="nx">isConnected</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">provider</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">detectEthereumProvider</span><span class="p">();</span>
+    <span class="kr">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span> <span class="nx">method</span><span class="o">:</span> <span class="s2">&#34;eth_accounts&#34;</span> <span class="p">});</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">setAccount</span><span class="p">(</span><span class="nx">accounts</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&#34;No authorized account found&#34;</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="kr">const</span> <span class="nx">connect</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">provider</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">detectEthereumProvider</span><span class="p">();</span>
+      
+      <span class="c1">// returns an array of accounts
+</span><span class="c1"></span>      <span class="kr">const</span> <span class="nx">accounts</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span> <span class="nx">method</span><span class="o">:</span> <span class="s2">&#34;eth_requestAccounts&#34;</span> <span class="p">});</span>
+      
+      <span class="c1">// check if array at least one element. if so, set account to the first one.
+</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">setAccount</span><span class="p">(</span><span class="nx">accounts</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;No account found&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">header</span> <span class="na">className</span><span class="o">=</span><span class="s">&#34;App-header&#34;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="nx">calend3</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;slogan&#34;</span><span class="p">&gt;</span><span class="nx">web3</span> <span class="nx">appointment</span> <span class="nx">scheduler</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+      <span class="p">{</span><span class="o">!</span><span class="nx">account</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">button</span> <span class="na">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">connect</span><span class="p">}&gt;</span><span class="nx">connect</span> <span class="nx">wallet</span><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;}</span>
+      <span class="p">{</span><span class="nx">account</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">Calendar</span> <span class="p">/&gt;}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</code></pre></div><h1 id="next-steps-appointments">Next Steps: Appointments</h1>
+<p>Congrats! We now have a Connect Wallet screen and a way to identify the user&rsquo;s Ethereum account. Now that we can identify a connected Ethereum address, we can add appointment scheduling functionality.</p>
+<p>In the next section, we will add appointment data structures and scheduling functions to our smart contract. We will also discuss sending and receiving payments in Ether. See you in the next section :).</p>
+</article>
+
+        </main><footer id="footer">
+    copyright © 2022 parttimelarry
+</footer>
+</body>
+</html>
