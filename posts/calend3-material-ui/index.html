@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="hacking the markets: financial programming tutorials by parttimelarry">
+    
+    <link rel="shortcut icon" href="https://hackingthemarkets.github.io/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>web3 tutorial [08/10] - material-ui: building the calendar interface</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://hackingthemarkets.github.io">hacking the markets</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="https://youtube.com/parttimelarry" title="youtube">youtube</a>
+            </li><li>
+                <a href="https://twitter.com/parttimelarry" title="twitter">twitter</a>
+            </li><li>
+                <a href="https://github.com/hackingthemarkets" title="github">github</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>web3 tutorial [08/10] - material-ui: building the calendar interface</h1>
+            <div>
+                <time>February 8, 2022</time>
+                
+                <span>
+                    
+                        by parttimelarry
+                    
+                </span></div>
+    </header><br />
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/yfU7lKgOnRw" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<aside id="toc">
+    <h4>Table of Contents</h4>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-is-material-ui">What is Material UI?</a></li>
+    <li><a href="#react-scheduler">React Scheduler</a>
+      <ul>
+        <li><a href="#customizing-the-week-view-with-react-props">Customizing the Week View with React Props</a></li>
+        <li><a href="#rendering-mock-appointment-data">Rendering Mock Appointment Data</a></li>
+        <li><a href="#callback-functions">Callback Functions</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+</aside>
+
+<h1 id="what-is-material-ui">What is Material UI?</h1>
+<p>One of the benefits of using React is its ecosystem of well designed component libraries. These include Material UI, React Bootstrap, Semantic UI, and Chakra UI, among others. These component libraries include widgets for common use cases like icons, buttons, sliders, date and time pickers, and more.</p>
+<p>Creating a full calendar and scheduling component with date and time pickers is an entire project on its own. Rather than building this from scratch, we will integrate an existing Calendar component. For our project, we will integrate <a href="https://devexpress.github.io/devextreme-reactive/react/scheduler/">React Scheduler</a>, a component inspired by Google Calendar.</p>
+<h1 id="react-scheduler">React Scheduler</h1>
+<p>To get started, we will consult the <a href="https://devexpress.github.io/devextreme-reactive/react/scheduler/docs/guides/getting-started/">React Scheduler documentation</a>. We need to install the appropriate packages with <strong>npm</strong>. Let&rsquo;s open a terminal and make sure we are in the <strong>frontend/</strong> directory of our proejct. Enter the following command to install the react-scheduler component and Material UI dependencies.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm install --save @devexpress/dx-react-core @devexpress/dx-react-scheduler @devexpress/dx-react-scheduler-material-ui
+</code></pre></div><p>Once the packages have been installed, let&rsquo;s open the components/Calendar.js file that we created in the last section. Remember we only created a simple placeholder for a calendar. Let&rsquo;s import the React Scheduler components and add them to our Calendar component using the code below:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="cm">/* Scheduling Component */</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">ViewState</span><span class="p">,</span> <span class="nx">EditingState</span><span class="p">,</span> <span class="nx">IntegratedEditing</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@devexpress/dx-react-scheduler&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">Scheduler</span><span class="p">,</span> <span class="nx">WeekView</span><span class="p">,</span> <span class="nx">Appointments</span><span class="p">,</span> <span class="nx">AppointmentForm</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@devexpress/dx-react-scheduler-material-ui&#39;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">Calendar</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;calendar&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">Scheduler</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">ViewState</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">EditingState</span>  <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">IntegratedEditing</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">WeekView</span>  <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">Appointments</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">AppointmentForm</span> <span class="p">/&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">Scheduler</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Calendar</span><span class="p">;</span>
+</code></pre></div><p>All of the components we imported are documented in the <a href="https://devexpress.github.io/devextreme-reactive/react/scheduler/docs/guides/getting-started/">Getting Started guide</a> if you want to know the details of each component. The key point here is that React Scheduler provides reuseable components like <WeekView /> and <AppointmentForm /> that can be customized based on our application&rsquo;s needs.</p>
+<p>Let&rsquo;s take a look at our webapp and see how it looks so far:</p>
+<p><img src="/web3-tutorial/material-ui/calendar.png" alt="Calendar"></p>
+<p>Already looks pretty good! We have a weekly calendar view and we can click it and see an appointment form. We just need to figure out how to customize it and integrate it with our smart contract.</p>
+<p><img src="/web3-tutorial/material-ui/calendar-appointment.png" alt="Calendar"></p>
+<h2 id="customizing-the-week-view-with-react-props">Customizing the Week View with React Props</h2>
+<p>Customization of a React component is done via props. Props let us pass information to a component in a manner similar to how we use attributes and values in HTML. Each component accepts certain props that let us customize its behavior.</p>
+<p>The first thing we will customize is the hours shown on the calendar. I personally hate 8AM meetings, so we will simply remove these from the calendar. We also don&rsquo;t want to meet after 7PM because we have a life.  The WeekView component is <a href="https://devexpress.github.io/devextreme-reactive/react/scheduler/docs/reference/week-view/">documented here</a> and provides the props <strong>startDayHour</strong> and <strong>endDayHour</strong>, which let us define the start and end hours of each day. We will use 9 for the startDayHour and 19 for the endDayHour:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="p">&lt;</span><span class="nt">WeekView</span> <span class="na">startDayHour</span><span class="o">=</span><span class="p">{</span><span class="mi">9</span><span class="p">}</span> <span class="na">endDayHour</span><span class="o">=</span><span class="p">{</span><span class="mi">19</span><span class="p">}/&gt;</span>
+</code></pre></div><h2 id="rendering-mock-appointment-data">Rendering Mock Appointment Data</h2>
+<p>Next we want to see how appointments look on our calendar and make sure this functionality works. Before we connect the calendar to the blockchain, let&rsquo;s add some sample mock data. This will prepare us for how we need to transform and structure the blockchain data when we hook it up in the next section.</p>
+<p>In the example on the React Scheduler site, the documentation provides a sample data structure to render an appointment:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="nx">schedulerData</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="nx">startDate</span><span class="o">:</span> <span class="s1">&#39;2018-11-01T09:45&#39;</span><span class="p">,</span> <span class="nx">endDate</span><span class="o">:</span> <span class="s1">&#39;2018-11-01T11:00&#39;</span><span class="p">,</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Meeting&#39;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">startDate</span><span class="o">:</span> <span class="s1">&#39;2018-11-01T12:00&#39;</span><span class="p">,</span> <span class="nx">endDate</span><span class="o">:</span> <span class="s1">&#39;2018-11-01T13:30&#39;</span><span class="p">,</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Go to a gym&#39;</span> <span class="p">},</span>
+<span class="p">];</span>
+</code></pre></div><p>Let&rsquo;s modify this slightly to reflect the current week and year and see how it looks on the calendar.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="nx">schedulerData</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="nx">startDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-24T09:45&#39;</span><span class="p">,</span> <span class="nx">endDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-24T11:00&#39;</span><span class="p">,</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Dogecoin Integration&#39;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">startDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-25T12:00&#39;</span><span class="p">,</span> <span class="nx">endDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-25T13:30&#39;</span><span class="p">,</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Podcast appearance&#39;</span> <span class="p">},</span>
+<span class="p">];</span>
+</code></pre></div><p>To connect it to the Scheduler, we pass schedulerData to the data prop like so:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="p">&lt;</span><span class="nt">Scheduler</span> <span class="na">data</span><span class="o">=</span><span class="p">{</span><span class="nx">schedulerData</span><span class="p">}&gt;</span>
+</code></pre></div><p>Let&rsquo;s see how it looks on the webapp:</p>
+<p><img src="/web3-tutorial/material-ui/calendar-customized.png" alt="Calendar Customized"></p>
+<p>Beautiful. We now see some example appointments on our calendar and will swap these out with real data that is fetched from the blockchain in the next section.</p>
+<h2 id="callback-functions">Callback Functions</h2>
+<p>The last component we will customize in this Appointment Editor. We want to capture the data that is submitted in the form so that we can submit it to our smart contract.</p>
+<p><img src="/web3-tutorial/material-ui/calendar-callback1.png" alt="Calendar Callback Function"></p>
+<p>According to <a href="https://devexpress.github.io/devextreme-reactive/react/scheduler/docs/reference/editing-state/">documentation</a>, we can pass a callback function to the onCommitChanges prop. Let&rsquo;s define a function called saveAppointment that will be called when the save button is clicked on the appointment form.</p>
+<p>For now, let&rsquo;s just log the data that is saved to the console and observe the Developer Tools in Chrome. This is just a placeholder to make sure this logic is fired when the form is saved. We&rsquo;ll fill in the blockchain logic in the next section.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="nx">saveAppointment</span> <span class="o">=</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;committing changes&#39;</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><p>To connect this callback function to the EditingState component, we just pass it in to the onCommitChanges prop like so:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="p">&lt;</span><span class="nt">EditingState</span> <span class="na">onCommitChanges</span><span class="o">=</span><span class="p">{</span><span class="nx">saveAppointment</span><span class="p">}</span> <span class="p">/&gt;</span>
+</code></pre></div><p>If we save an appointment while the JavaScript console is open, we can see our function is called and an object is submitted that describes our form submission. It has an &ldquo;added&rdquo; attribute, a startDate, an endDate, a title, and notes.</p>
+<p><img src="/web3-tutorial/material-ui/calendar-callback2.png" alt="Calendar Callback Function"></p>
+<p>Great progress in this section! It&rsquo;s really coming together. Your Calendar.js should now closely match the code below. In the next section, we will connect this UI to our smart contract and use data from the blockchain.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="cm">/* Scheduling Component */</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">ViewState</span><span class="p">,</span> <span class="nx">EditingState</span><span class="p">,</span> <span class="nx">IntegratedEditing</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@devexpress/dx-react-scheduler&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">Scheduler</span><span class="p">,</span> <span class="nx">WeekView</span><span class="p">,</span> <span class="nx">Appointments</span><span class="p">,</span> <span class="nx">AppointmentForm</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@devexpress/dx-react-scheduler-material-ui&#39;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">schedulerData</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">startDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-24T09:45&#39;</span><span class="p">,</span> <span class="nx">endDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-24T11:00&#39;</span><span class="p">,</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Dogecoin Integration&#39;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">startDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-25T12:00&#39;</span><span class="p">,</span> <span class="nx">endDate</span><span class="o">:</span> <span class="s1">&#39;2022-02-25T13:30&#39;</span><span class="p">,</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Podcast Appearance&#39;</span> <span class="p">},</span>
+<span class="p">];</span>
+
+<span class="kr">const</span> <span class="nx">Calendar</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+
+    <span class="kr">const</span> <span class="nx">saveAppointment</span> <span class="o">=</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;committing changes&#39;</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">(&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;calendar&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">Scheduler</span> <span class="na">data</span><span class="o">=</span><span class="p">{</span><span class="nx">schedulerData</span><span class="p">}&gt;</span>
+        <span class="p">&lt;</span><span class="nt">ViewState</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">EditingState</span> <span class="na">onCommitChanges</span><span class="o">=</span><span class="p">{</span><span class="nx">saveAppointment</span><span class="p">}</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">IntegratedEditing</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">WeekView</span> <span class="na">startDayHour</span><span class="o">=</span><span class="p">{</span><span class="mi">9</span><span class="p">}</span> <span class="na">endDayHour</span><span class="o">=</span><span class="p">{</span><span class="mi">19</span><span class="p">}/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">Appointments</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">AppointmentForm</span> <span class="p">/&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">Scheduler</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;);</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Calendar</span><span class="p">;</span>
+</code></pre></div></article>
+
+        </main><footer id="footer">
+    copyright © 2022 parttimelarry
+</footer>
+</body>
+</html>
