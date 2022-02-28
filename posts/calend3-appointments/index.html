@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="hacking the markets: financial programming tutorials by parttimelarry">
+    
+    <link rel="shortcut icon" href="https://hackingthemarkets.github.io/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XCGL4SLHHN"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XCGL4SLHHN', { 'anonymize_ip': false });
+}
+</script>
+
+
+    <title>web3 tutorial [10/11] - appointments: writing data to the blockchain</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://hackingthemarkets.github.io">hacking the markets</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="https://youtube.com/parttimelarry" title="youtube">youtube</a>
+            </li><li>
+                <a href="https://twitter.com/parttimelarry" title="twitter">twitter</a>
+            </li><li>
+                <a href="https://github.com/hackingthemarkets" title="github">github</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>web3 tutorial [10/11] - appointments: writing data to the blockchain</h1>
+            <div>
+                <time>February 26, 2022</time>
+                
+                <span>
+                    
+                        by parttimelarry
+                    
+                </span></div>
+    </header><br />
+<aside id="toc">
+    <h4>Table of Contents</h4>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#fetching-appointments">Fetching Appointments</a>
+      <ul>
+        <li><a href="#creating-an-appointment">Creating an Appointment</a></li>
+        <li><a href="#transforming-the-getappointments-response">Transforming the getAppointments() Response</a></li>
+        <li><a href="#create-appointment">Create Appointment</a></li>
+      </ul>
+    </li>
+    <li><a href="#dialog">Dialog</a></li>
+  </ul>
+</nav>
+</aside>
+
+<h1 id="fetching-appointments">Fetching Appointments</h1>
+<p>Let&rsquo;s create a function called getData() that does all of this and calls the getAppointments() function of our smart contract. We will use the useEffect() hook to call getData after the UI renders.</p>
+<p>We will get the owner of the smart contract. We will get</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="c1">// appointment setting and storage
+</span><span class="c1"></span><span class="kr">const</span> <span class="p">[</span><span class="nx">appointments</span><span class="p">,</span> <span class="nx">setAppointments</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">([]);</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="nx">Calendar</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// admin rate setting functionality
+</span><span class="c1"></span>    <span class="kr">const</span> <span class="p">[</span><span class="nx">showAdmin</span><span class="p">,</span> <span class="nx">setShowAdmin</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="kr">const</span> <span class="p">[</span><span class="nx">isAdmin</span><span class="p">,</span> <span class="nx">setIsAdmin</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="kr">const</span> <span class="p">[</span><span class="nx">rate</span><span class="p">,</span> <span class="nx">setRate</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    
+    <span class="kr">const</span> <span class="nx">getData</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// get contract owner and set admin if connected account is owner
+</span><span class="c1"></span>        <span class="kr">const</span> <span class="nx">owner</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">owner</span><span class="p">();</span>
+        <span class="nx">setIsAdmin</span><span class="p">(</span><span class="nx">owner</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">()</span> <span class="o">===</span> <span class="nx">props</span><span class="p">.</span><span class="nx">account</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">());</span>
+
+        <span class="kr">const</span> <span class="nx">appointments</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">getAppointments</span><span class="p">();</span>
+        <span class="kr">const</span> <span class="nx">rate</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">getRate</span><span class="p">();</span>
+
+        <span class="nx">setRate</span><span class="p">(</span><span class="nx">ethers</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nx">formatEther</span><span class="p">(</span><span class="nx">rate</span><span class="p">.</span><span class="nx">toString</span><span class="p">()));</span>
+
+        <span class="nx">transformAppointments</span><span class="p">(</span><span class="nx">appointments</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kr">const</span> <span class="nx">transformAppointments</span> <span class="o">=</span> <span class="p">(</span><span class="nx">appointments</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
+        <span class="nx">appointments</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">appointment</span> <span class="p">=&gt;</span> <span class="p">{</span>
+          <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+            <span class="nx">title</span><span class="o">:</span> <span class="nx">appointment</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+            <span class="nx">startDate</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">appointment</span><span class="p">.</span><span class="nx">startTime</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
+            <span class="nx">endDate</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">appointment</span><span class="p">.</span><span class="nx">endTime</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
+          <span class="p">});</span>
+        <span class="p">});</span>
+
+        <span class="nx">setAppointments</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+    <span class="p">}</span>
+
+
+    <span class="nx">useEffect</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="nx">getData</span><span class="p">();</span>
+    <span class="p">},</span> <span class="p">[]);</span>
+</code></pre></div><p>If all went according to plan, you should see &lsquo;got appointments&rsquo; in your web browser&rsquo;s JavaScript console.</p>
+<h2 id="creating-an-appointment">Creating an Appointment</h2>
+<p>So far the appointments array is empty. This is because we haven&rsquo;t created an appointment yet. We will use the same technique to call createAppointment() when the appointment form is saved. If you recall, the React Scheduler component submits data that has the following structure:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="p">{</span>
+    <span class="s2">&#34;added&#34;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&#34;title&#34;</span><span class="o">:</span> <span class="s2">&#34;test appointment&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;startDate&#34;</span><span class="o">:</span> <span class="s2">&#34;2022-02-08T18:00:00.000Z&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;endDate&#34;</span><span class="o">:</span> <span class="s2">&#34;2022-02-08T18:30:00.000Z&#34;</span><span class="p">,</span>
+        <span class="s2">&#34;allDay&#34;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="s2">&#34;notes&#34;</span><span class="o">:</span> <span class="s2">&#34;some notes&#34;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>So all we need to do is feed this data to our createAppointment() inputs.</p>
+<p>Call createAppointment, calculate message to send.</p>
+<p>2.5 Hour Meeting costs 1.5 ETH.</p>
+<p>Go back and make rate screen that can be called by contract owner.</p>
+<p>Maybe split up solidity section into Admin config screen vs. regular user.</p>
+<h2 id="transforming-the-getappointments-response">Transforming the getAppointments() Response</h2>
+<p>Fetch and render</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="p">[</span><span class="nx">showDialog</span><span class="p">,</span> <span class="nx">setShowDialog</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="kr">const</span> <span class="p">[</span><span class="nx">showSign</span><span class="p">,</span> <span class="nx">setShowSign</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="kr">const</span> <span class="p">[</span><span class="nx">mined</span><span class="p">,</span> <span class="nx">setMined</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="kr">const</span> <span class="p">[</span><span class="nx">transactionHash</span><span class="p">,</span> <span class="nx">setTransactionHash</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">);</span>
+</code></pre></div><h2 id="create-appointment">Create Appointment</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="nx">saveAppointment</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">appointment</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">added</span><span class="p">;</span>
+  <span class="kr">const</span> <span class="nx">title</span> <span class="o">=</span> <span class="nx">appointment</span><span class="p">.</span><span class="nx">title</span><span class="p">;</span>
+  <span class="kr">const</span> <span class="nx">startTime</span> <span class="o">=</span> <span class="nx">appointment</span><span class="p">.</span><span class="nx">startDate</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="kr">const</span> <span class="nx">endTime</span> <span class="o">=</span> <span class="nx">appointment</span><span class="p">.</span><span class="nx">endDate</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">;</span>
+
+  <span class="nx">setShowSign</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+  <span class="nx">setShowDialog</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+  <span class="nx">setMined</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+  <span class="k">try</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">cost</span> <span class="o">=</span> <span class="p">((</span><span class="nx">endTime</span> <span class="o">-</span> <span class="nx">startTime</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">*</span> <span class="nx">rate</span><span class="p">;</span>
+      <span class="kr">const</span> <span class="nx">msg</span> <span class="o">=</span> <span class="p">{</span><span class="nx">value</span><span class="o">:</span> <span class="nx">ethers</span><span class="p">.</span><span class="nx">utils</span><span class="p">.</span><span class="nx">parseEther</span><span class="p">(</span><span class="nx">cost</span><span class="p">.</span><span class="nx">toString</span><span class="p">())};</span>
+      <span class="kd">let</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="kr">await</span> <span class="nx">contract</span><span class="p">.</span><span class="nx">createAppointment</span><span class="p">(</span><span class="nx">title</span><span class="p">,</span> <span class="nx">startTime</span><span class="p">,</span> <span class="nx">endTime</span><span class="p">,</span> <span class="nx">msg</span><span class="p">);</span>
+      
+      <span class="nx">setShowSign</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+      <span class="kr">await</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">wait</span><span class="p">();</span>
+
+      <span class="nx">setMined</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+      <span class="nx">setTransactionHash</span><span class="p">(</span><span class="nx">transaction</span><span class="p">.</span><span class="nx">hash</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h1 id="dialog">Dialog</h1>
+<p>Display waiting while mining</p>
+<p>Show etherscan address</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">import</span> <span class="nx">Dialog</span> <span class="nx">from</span> <span class="s1">&#39;@mui/material/Dialog&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">CircularProgress</span> <span class="nx">from</span> <span class="s1">&#39;@mui/material/CircularProgress&#39;</span><span class="p">;</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-jsx" data-lang="jsx"><span class="kr">const</span> <span class="nx">ConfirmDialog</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">&lt;</span><span class="nt">Dialog</span>
+      <span class="na">open</span><span class="o">=</span><span class="p">{</span><span class="kc">true</span><span class="p">}</span>
+      <span class="na">aria</span><span class="err">-</span><span class="na">labelledby</span><span class="o">=</span><span class="s">&#34;alert-dialog-title&#34;</span>
+      <span class="na">aria</span><span class="err">-</span><span class="na">describedby</span><span class="o">=</span><span class="s">&#34;alert-dialog-description&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>
+        <span class="p">{</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> <span class="s1">&#39;Appointment Confirmed&#39;</span><span class="p">}</span>
+        <span class="p">{</span><span class="o">!</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">showSign</span> <span class="o">&amp;&amp;</span> <span class="s1">&#39;Confirming Your Appointment...&#39;</span><span class="p">}</span>
+        <span class="p">{</span><span class="o">!</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> <span class="nx">showSign</span> <span class="o">&amp;&amp;</span> <span class="s1">&#39;Please Sign to Confirm&#39;</span><span class="p">}</span>
+      <span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="p">{{</span><span class="nx">textAlign</span><span class="o">:</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="nx">padding</span><span class="o">:</span> <span class="s1">&#39;0px 20px 20px 20px&#39;</span><span class="p">}}&gt;</span>
+          <span class="p">{</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+            <span class="nx">Your</span> <span class="nx">appointment</span> <span class="nx">has</span> <span class="nx">been</span> <span class="nx">confirmed</span> <span class="nx">and</span> <span class="nx">is</span> <span class="nx">on</span> <span class="nx">the</span> <span class="nx">blockchain</span><span class="p">.&lt;</span><span class="nt">br</span> <span class="p">/&gt;&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            <span class="p">&lt;</span><span class="nt">a</span> <span class="na">target</span><span class="o">=</span><span class="s">&#34;_blank&#34;</span> <span class="na">href</span><span class="o">=</span><span class="p">{</span><span class="sb">`https://goerli.etherscan.io/tx/</span><span class="si">${</span><span class="nx">transactionHash</span><span class="si">}</span><span class="sb">`</span><span class="p">}&gt;</span><span class="nx">View</span> <span class="nx">on</span> <span class="nx">Etherscan</span><span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;}</span>
+        <span class="p">{</span><span class="o">!</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">showSign</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="nx">Please</span> <span class="nx">wait</span> <span class="k">while</span> <span class="nx">we</span> <span class="nx">confirm</span> <span class="nx">your</span> <span class="nx">appoinment</span> <span class="nx">on</span> <span class="nx">the</span> <span class="nx">blockchain</span><span class="p">....&lt;/</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;}</span>
+        <span class="p">{</span><span class="o">!</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> <span class="nx">showSign</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="nx">Please</span> <span class="nx">sign</span> <span class="nx">the</span> <span class="nx">transaction</span> <span class="nx">to</span> <span class="nx">confirm</span> <span class="nx">your</span> <span class="nx">appointment</span><span class="p">.&lt;/</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="p">{{</span><span class="nx">textAlign</span><span class="o">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="nx">paddingBottom</span><span class="o">:</span> <span class="s1">&#39;30px&#39;</span><span class="p">}}&gt;</span>
+      <span class="p">{</span><span class="o">!</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> <span class="p">&lt;</span><span class="nt">CircularProgress</span> <span class="p">/&gt;}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+      <span class="p">{</span><span class="nx">mined</span> <span class="o">&amp;&amp;</span> 
+      <span class="p">&lt;</span><span class="nt">Button</span> <span class="na">onClick</span><span class="o">=</span><span class="p">{()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+          <span class="nx">setShowDialog</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+          <span class="nx">getData</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="p">}&gt;</span><span class="nx">Close</span><span class="p">&lt;/</span><span class="nt">Button</span><span class="p">&gt;}</span>
+    <span class="p">&lt;/</span><span class="nt">Dialog</span><span class="p">&gt;</span>
+  <span class="p">}</span>
+</code></pre></div></article>
+
+        </main><footer id="footer">
+    copyright © 2022 parttimelarry
+</footer>
+</body>
+</html>
