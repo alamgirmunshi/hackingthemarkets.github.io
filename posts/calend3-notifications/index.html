@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="hacking the markets: financial programming tutorials by parttimelarry">
+    
+    <link rel="shortcut icon" href="https://hackingthemarkets.github.io/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XCGL4SLHHN"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XCGL4SLHHN', { 'anonymize_ip': false });
+}
+</script>
+
+
+    <title>web3 tutorial [10/10] - twilio: push notifications with alchemy notify</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://hackingthemarkets.github.io">hacking the markets</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="https://youtube.com/parttimelarry" title="youtube">youtube</a>
+            </li><li>
+                <a href="https://twitter.com/parttimelarry" title="twitter">twitter</a>
+            </li><li>
+                <a href="https://github.com/hackingthemarkets" title="github">github</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>web3 tutorial [10/10] - twilio: push notifications with alchemy notify</h1>
+            <div>
+                <time>February 28, 2022</time>
+                
+                <span>
+                    
+                        by parttimelarry
+                    
+                </span></div>
+    </header><br />
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/vulhtRAdl1M" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<aside id="toc">
+    <h4>Table of Contents</h4>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#blockchain-notifications">Blockchain Notifications</a></li>
+    <li><a href="#alchemy-notify">Alchemy Notify</a></li>
+    <li><a href="#nodejs-and-express">Node.js and Express</a>
+      <ul>
+        <li><a href="#processing-a-post-request">Processing a POST request</a></li>
+      </ul>
+    </li>
+    <li><a href="#twilio-api">Twilio API</a>
+      <ul>
+        <li><a href="#exposing-our-webhook-publicly">Exposing Our Webhook Publicly</a></li>
+      </ul>
+    </li>
+    <li><a href="#validating-the-signature">Validating the Signature</a></li>
+  </ul>
+</nav>
+</aside>
+
+<h1 id="blockchain-notifications">Blockchain Notifications</h1>
+<p>Welcome to Part 10. It&rsquo;s been a long journey. We have successfully created a Solidity smart contract and a React UI, and users are able connect their wallets and schedule meetings.</p>
+<p>But as an admin, how do I know if someone has added a meeting? Well, I could refresh my calendar repeatedly and poll for new meetings until one appears. But that wouldn&rsquo;t be very efficient. It would be great to just receive an email or text message when a new meeting has been scheduled. In a database like PostgreSQL we might use a TRIGGER or the LISTEN and NOTIFY commands to take action on an event, but how do we do this on the blockchain?</p>
+<h1 id="alchemy-notify">Alchemy Notify</h1>
+<p>We will use <a href="https://www.alchemy.com/notify">Alchemy Notify</a> to add real-time <strong>push notifications</strong> to our application. With Alchemy Notify, we can receive a webhook message when there is  on-chain activity of interest. We can write code to process this webhook message and add our own custom functionality. In our case, we will send an SMS text message when a user interacts with our smart contract.</p>
+<p>We&rsquo;ll create a webhook with Alchemy Notify and write a Node.js application to receive the webhook. The Node.js application will use the Twilio API to send an SMS text message to the admin&rsquo;s phone number.</p>
+<p>To get started, log in to the Alchemy account that you created in Part 5 of this tutorial. Click the Notify tab, then click &ldquo;Create Webhook&rdquo;:</p>
+<p><img src="/web3-tutorial/alchemy/notify_webhook.png" alt="Alchemy Notify Webhook"></p>
+<p>You will select your App in the dropdown and enter your smart contract address in this form. You will also enter a URL for your webhook. We won&rsquo;t create the webhook in Alchemy just yet since we don&rsquo;t have our webhook URL ready to receive it. We can code up a web application or a serverless function in any language to provide this webhook URL.</p>
+<h1 id="nodejs-and-express">Node.js and Express</h1>
+<p>Since we&rsquo;ve been using JavaScript throughout this tutorial, we&rsquo;ll build a small Node.js application to receive the webhook message. To get started, let&rsquo;s make a <strong>directory</strong> called <strong>webhooks</strong> in the top level of our project. Then we&rsquo;ll go into that directory and initialize a new node application. In the webhooks directory, we will use <strong>npm</strong> to install <strong>express</strong>, <strong>body-parser</strong>, and <strong>twilio</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">mkdir webhooks
+<span class="nb">cd</span> webhooks <span class="o">&amp;&amp;</span> npm init -y
+npm install express body-parser twilio
+</code></pre></div><p>In your webhooks directory, create a file called index.js with the following code:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&#34;express&#34;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">bodyParser</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&#34;body-parser&#34;</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+<span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">3100</span><span class="p">;</span>
+
+<span class="c1">// this application will receive JSON data
+</span><span class="c1"></span><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">bodyParser</span><span class="p">.</span><span class="nx">json</span><span class="p">());</span>
+
+<span class="c1">// start the server on port 3100
+</span><span class="c1"></span><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Running on port </span><span class="si">${</span><span class="nx">PORT</span><span class="si">}</span><span class="sb">`</span><span class="p">));</span>
+
+<span class="c1">// process a GET request to http://localhost:3100/hello
+</span><span class="c1"></span><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&#34;/hello&#34;</span><span class="p">,</span> <span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+
+    <span class="nx">response</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s2">&#34;hi!&#34;</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div><p>We will use <a href="https://expressjs.com/">Express</a>, a lightweight Node.js web framework for this application. Run the following command in the webhooks directory to run the server:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">node index.js
+</code></pre></div><p>You should see a server running on port 3100. If you access the URL http://localhost:3100/hello in your web browser, you should receive the message &ldquo;hi!&rdquo;. In this case, we are making a <strong>GET</strong> request since we are simply <strong>getting</strong> data from the server. A <strong>request</strong> comes in to <strong>/hello</strong> and we send it a <strong>response</strong> back.</p>
+<h2 id="processing-a-post-request">Processing a POST request</h2>
+<p>For Alchemy webhooks, we need to be able to process <strong>POST</strong> requests since Alchemy will be <strong>posting</strong> a webhook message that we need to process. Since the webhook message is in JSON format, we add <strong>app.use(bodyParser.json())</strong> to parse the JSON request. This will give us a nice JavaScript object that we can use when forming our SMS text message. Let&rsquo;s expand on our app and add a <strong>/webhook</strong> endpoint that accepts a POST request.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&#34;express&#34;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">bodyParser</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&#34;body-parser&#34;</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+<span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">3100</span><span class="p">;</span>
+
+<span class="c1">// this application will receive JSON data
+</span><span class="c1"></span><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">bodyParser</span><span class="p">.</span><span class="nx">json</span><span class="p">());</span>
+
+<span class="c1">// start the server on port 3100
+</span><span class="c1"></span><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Running on port </span><span class="si">${</span><span class="nx">PORT</span><span class="si">}</span><span class="sb">`</span><span class="p">));</span>
+
+<span class="c1">// process a GET request to http://localhost:3100/hello
+</span><span class="c1"></span><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&#34;/hello&#34;</span><span class="p">,</span> <span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+
+    <span class="nx">response</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s2">&#34;hi!&#34;</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s2">&#34;/webhook&#34;</span><span class="p">,</span> <span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+
+    <span class="kr">const</span> <span class="nx">message</span> <span class="o">=</span> <span class="s2">&#34;webhook post message received&#34;</span><span class="p">;</span>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div><p>Let&rsquo;s test that we can receive a POST request with a JSON body. To do this, we need to send a POST request to our application using either the command line or a graphical client. I use <a href="https://insomnia.rest/">Insomnia REST Client</a>, but some people use Postman or curl. Alchemy provides an example webhook request in the <a href="https://docs.alchemy.com/alchemy/guides/using-notify">Notify documentation</a>. We&rsquo;ll take this sample and paste it into the body of a new POST request to http://localhost:3100/webhook in Insomnia.</p>
+<p><img src="/web3-tutorial/alchemy/insomnia.png" alt="Alchemy Notify Webhook"></p>
+<p>When you send the post request to your express app, you should receive a response back. Awesome! Let&rsquo;s see if we can isolate some details from the JSON that is posted. Notice there is an &ldquo;activity&rdquo; attribute that contains an array of activity.</p>
+<p>Add the following lines to your webhook and let&rsquo;s return a formatted message.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">activity</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">activity</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">message</span> <span class="o">=</span> <span class="sb">`💰🚀 </span><span class="si">${</span><span class="nx">activity</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">fromAddress</span><span class="si">}</span><span class="sb"> paid you </span><span class="si">${</span><span class="nx">activity</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="si">}</span><span class="sb"> ETH. https://goerli.etherscan.io/tx/</span><span class="si">${</span><span class="nx">activity</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">hash</span><span class="si">}</span><span class="sb"> 💰🚀`</span><span class="p">;</span>
+</code></pre></div><p>Now when you post the example message, you should get a response like the one below. Notice how we substituted in actual values from the activity attribute:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">💰🚀 0x86005b57be708e031ea60acf9d3852377e74a6c9 paid you 0.1 ETH. https://goerli.etherscan.io/tx/0xbcbbd7c7de7b835939fb14d4ebe4d31ea6167f4c27c6f0940bb3fa1a90867abe 💰🚀
+</code></pre></div><p>Can you see how it&rsquo;s all coming together? Now we just need to figure out how to send this string as an SMS text message.</p>
+<h1 id="twilio-api">Twilio API</h1>
+<p>To send SMS messages, we&rsquo;ll be using the Twilio API. Twilio is the market leader in programmable telecommunications tools. To get started, <a href="https://www.twilio.com/referral/sAX8Re">Sign up for Twilio</a> and get a Trial Number, Account SID, and Auth Token.</p>
+<p><strong>Note:</strong> the link above is a referral link. If you end up upgrading, we both get $10 in Twilio credits. There are also ways to send SMS messages by using a special <a href="https://www.digitaltrends.com/mobile/how-to-send-a-text-from-your-email-account/">email address</a>. I&rsquo;ve covered this method in previous videos if you don&rsquo;t want to use Twilio for whatever reason.</p>
+<p>Twilio provides a <a href="https://www.twilio.com/docs/sms/tutorials/how-to-send-sms-messages-node-js">Node.js example</a> in the documentation. Let&rsquo;s incorporate the Twilio client into our Express app and then we&rsquo;ll be all set!</p>
+<p>Fill in the accountSid, authToken, fromPhone, and toPhone with your own. We&rsquo;ll test the endpoint again locally to make sure it sends a text message to our phone.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&#34;express&#34;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">bodyParser</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&#34;body-parser&#34;</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">accountSid</span> <span class="o">=</span> <span class="s1">&#39;YOURSID&#39;</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">authToken</span> <span class="o">=</span> <span class="s1">&#39;YOURTOKEN&#39;</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">fromPhone</span> <span class="o">=</span> <span class="s1">&#39;+1TWILIOPHONE&#39;</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">toPhone</span> <span class="o">=</span> <span class="s1">&#39;+1YOURPHONE&#39;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+<span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">3100</span><span class="p">;</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">bodyParser</span><span class="p">.</span><span class="nx">json</span><span class="p">());</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Running on port </span><span class="si">${</span><span class="nx">PORT</span><span class="si">}</span><span class="sb">`</span><span class="p">));</span>
+
+<span class="c1">// set up twilio client
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;twilio&#39;</span><span class="p">)(</span><span class="nx">accountSid</span><span class="p">,</span> <span class="nx">authToken</span><span class="p">);</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s2">&#34;/webhook&#34;</span><span class="p">,</span> <span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+
+  <span class="kr">const</span> <span class="nx">activity</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">activity</span><span class="p">;</span>
+  <span class="kr">const</span> <span class="nx">message</span> <span class="o">=</span> <span class="sb">`💰🚀 </span><span class="si">${</span><span class="nx">activity</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">fromAddress</span><span class="si">}</span><span class="sb"> paid you </span><span class="si">${</span><span class="nx">activity</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="si">}</span><span class="sb"> ETH. https://goerli.etherscan.io/tx/</span><span class="si">${</span><span class="nx">activity</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">hash</span><span class="si">}</span><span class="sb"> 💰🚀`</span><span class="p">;</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;activity&#39;</span><span class="p">,</span> <span class="nx">activity</span><span class="p">);</span>
+
+  <span class="nx">client</span><span class="p">.</span><span class="nx">messages</span>
+    <span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+       <span class="nx">body</span><span class="o">:</span> <span class="nx">message</span><span class="p">,</span>
+       <span class="nx">from</span><span class="o">:</span> <span class="nx">fromPhone</span><span class="p">,</span>
+       <span class="nx">to</span><span class="o">:</span> <span class="nx">toPhone</span>
+     <span class="p">})</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">message</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">sid</span><span class="p">));</span>
+
+  <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">200</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre></div><h2 id="exposing-our-webhook-publicly">Exposing Our Webhook Publicly</h2>
+<p>Now we need to make our webhook available to Alchemy. We can either deploy our application, expose our IP address, or use a tool like ngrok. If you decide to use ngrok, you simply <a href="https://ngrok.com/docs">sign up for an account</a>, download the ngrok command line utility, and run a few commands.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">unzip /path/to/ngrok.zip
+ngrok authtoken <span class="o">[</span>your token<span class="o">]</span>
+ngrok http <span class="m">3100</span>
+</code></pre></div><p>This will give you a public ngrok.io address that routes to your local server running on port 3100. We can then provide this webhook URL to Alchemy and test our app. If all went well, we should receive a text message confirming our appointments:</p>
+<p><img src="/web3-tutorial/alchemy/notify_sms.jpg" alt="Alchemy Notify Webhook"></p>
+<h1 id="validating-the-signature">Validating the Signature</h1>
+<p>A final point that I didn&rsquo;t mention in the video. Alchemy Notify provides a mechanism of validating the request by checking for a valid signature. An example JavaScript function is provided that accepts the request and checks for a valid signature. This ensures that the request is coming from Alchemy and not a malicious actor who wants to bomb us with text messages :).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">Request Signature
+
+POST /yourWebhookServer/push HTTP/1.1
+Content-Type: application/json<span class="p">;</span>
+X-Alchemy-Signature: your-hashed-signature
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">isValidSignature</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span> <span class="p">{</span>    
+    <span class="kr">const</span> <span class="nx">token</span> <span class="o">=</span> <span class="s1">&#39;Auth token provided by Alchemy on the Webhook setup page&#39;</span><span class="p">;</span>
+    <span class="kr">const</span> <span class="nx">headers</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">headers</span><span class="p">;</span>
+    <span class="kr">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;x-alchemy-signature&#39;</span><span class="p">];</span> <span class="c1">// Lowercase for NodeJS
+</span><span class="c1"></span>    <span class="kr">const</span> <span class="nx">body</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>    
+    <span class="kr">const</span> <span class="nx">hmac</span> <span class="o">=</span> <span class="nx">crypto</span><span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">,</span> <span class="nx">token</span><span class="p">)</span> <span class="c1">// Create a HMAC SHA256 hash using the auth token
+</span><span class="c1"></span>    <span class="nx">hmac</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">body</span><span class="p">),</span> <span class="s1">&#39;utf8&#39;</span><span class="p">)</span> <span class="c1">// Update the token hash with the request body using utf8
+</span><span class="c1"></span>    <span class="kr">const</span> <span class="nx">digest</span> <span class="o">=</span> <span class="nx">hmac</span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;hex&#39;</span><span class="p">);</span>     
+    <span class="k">return</span> <span class="p">(</span><span class="nx">signature</span> <span class="o">===</span> <span class="nx">digest</span><span class="p">);</span> <span class="c1">// If signature equals your computed hash, return true
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>That&rsquo;s it for this series. Feel free to make this application your own!</p>
+</article>
+
+        </main><footer id="footer">
+    copyright © 2022 parttimelarry
+</footer>
+</body>
+</html>
